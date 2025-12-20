@@ -1,0 +1,129 @@
+/* ヘッダー */
+body {
+    margin: 0;
+    font-family: "Helvetica", "Arial", sans-serif;
+    background: #fff;
+}
+
+/* ----- Header ----- */
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #000;
+    padding: 10px 20px;
+}
+
+.logo {
+    height: 40px;
+}
+
+.header-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+.search-box {
+    width:100%;
+    max-width: 400px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 24px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-link {
+    color: #fff;
+    text-decoration: none;
+    font-size: 24px;
+}
+
+.sell-btn {
+    background: #fff;
+    color: #000;
+    padding: 7px 18px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+
+.profile-container {
+  max-width: 500px;
+  margin: 60px auto;
+  text-align: center;
+}
+
+.profile-title {
+  font-size: 36px;
+  margin-bottom: 30px;
+}
+
+.profile-image {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.image-placeholder {
+  width: 100px;
+  height: 100px;
+  background-color: #ddd;
+  border-radius: 50%;
+}
+
+.image-upload-btn {
+  display: inline-block;
+  color: #e65c5c;
+  border: 1px solid #e65c5c;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: left;
+  font-size: 24px;
+}
+
+.profile-form label {
+  margin-bottom: 3px;
+  font-size: 24px;
+}
+
+.profile-form input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.profile-form button {
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #e65c5c;
+  color: white;
+  font-size: 26px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}

@@ -1,0 +1,145 @@
+/* ===== 共通 ===== */
+body {
+    margin: 0;
+    font-family: "Helvetica", "Arial", sans-serif;
+    background: #fff;
+}
+
+/* ===== Header ===== */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #000;
+    padding: 10px 20px;
+}
+
+.header-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.search-box {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 24px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-link {
+    color: #fff;
+    text-decoration: none;
+    font-size: 24px;
+}
+
+.sell-btn {
+    background: #fff;
+    color: #000;
+    padding: 7px 18px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+/* ===== Profile ===== */
+.profile {
+    text-align: center;
+    padding: 20px;
+    font-size: 36px;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    background: lightgray;
+    border-radius: 50%;
+    margin: 0 auto;
+}
+
+.edit-btn {
+    border: 1px solid red;
+    background: white;
+    color: red;
+    padding: 5px 10px;
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 26px;
+}
+
+.edit-btn a {
+    color: red;
+    text-decoration: none;
+}
+
+/* ===== Tabs ===== */
+.tabs {
+    margin-top: 15px;
+    border-bottom: 1px solid #1c1b1b;
+    padding-bottom: 5px;
+    text-align: left;
+}
+
+.tabs .tab-label {
+    margin-right: 20px;
+    padding-bottom: 5px;
+    font-size: 24px;
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* ★ 選択中タブ（写真どおり） */
+.tabs .tab-label.active {
+    color: red;
+    border-bottom: 2px solid red;
+}
+
+/* ===== Content ===== */
+.content {
+    margin-top: 30px;
+}
+
+/* ===== Items ===== */
+.items-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin-top: 30px;
+}
+
+.item-card {
+    width: 200px;
+    text-align: center;
+}
+
+.item-card img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    background: #ddd;
+}
+
+.item-name {
+    margin-top: 10px;
+    font-size: 25px;
+}
+
+.item-price {
+    margin-top: 5px;
+    font-size: 25px;
+}
+
+.empty-message {
+    margin-top: 20px;
+    color: #666;
+}

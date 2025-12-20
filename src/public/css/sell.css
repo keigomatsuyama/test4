@@ -1,0 +1,157 @@
+body {
+    margin: 0;
+    font-family: "Helvetica", "Arial", sans-serif;
+    background: #fff;
+}
+
+/* ----- Header ----- */
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #000;
+    padding: 10px 20px;
+}
+.header-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.search-box {
+    width:100%;
+    max-width: 400px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 24px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-link {
+    color: #fff;
+    text-decoration: none;
+    font-size: 24px;
+}
+
+.sell-btn {
+    background: #fff;
+    color: #000;
+    padding: 7px 18px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+
+/* メイン */
+.form-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 36px;
+}
+h2 {
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+.item-form label {
+    font-weight: bold;
+    display: block;
+    margin-top: 20px;
+    font-size: 24px;
+}
+
+.image-upload {
+    border: 2px dashed #ccc;
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 24px;
+}
+.file-input {
+    display: none;
+}
+
+.image-select {
+    display: inline-block;
+    background-color: #f66;
+    color: #fff;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+}
+.category-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 15px;
+}
+
+/* チェックボックスは非表示 */
+.category-checkbox {
+    display: none;
+}
+
+/* 見た目はタグボタン */
+.category-label {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 2px solid #f66;
+    color: #f66;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* チェックされたとき赤くなる */
+.category-checkbox:checked + .category-label {
+    background-color: #f66;
+    color: #fff;
+}
+
+/* 入力 */
+/* 入力フォームの共通スタイル（画像のように見せるために必須） */
+input[type="text"]:not(.search-box),
+select,
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;     /* ← これがないとブラウザ標準になる */
+    border-radius: 4px;         /* ← 角が丸くなる */
+    font-size: 24px;
+    background-color: #fff;     /* ← 白背景に統一 */
+}
+
+textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+/* 出品ボタン */
+.submit-item {
+    width: 100%;
+    background-color: #f66;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    margin-top: 60px;
+    font-size:26px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
