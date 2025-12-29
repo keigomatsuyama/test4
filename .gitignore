@@ -1,3 +1,4 @@
 
 # docker mysql data (DO NOT COMMIT)
 docker/mysql/data/
+vendor/
