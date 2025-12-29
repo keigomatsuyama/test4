@@ -45,9 +45,13 @@ use Illuminate\Support\Str;
   </header>
 
   <main class="profile">
+    <div class="avatar">@if(Auth::user()->profile && Auth::user()->profile->profile_image)
+      <img src="{{ asset('storage/' . Auth::user()->profile->profile_image) }}"
+        alt="プロフィール画像">
+      @endif
 
-    <div class="avatar"></div>
-    <h2>ユーザー名</h2>
+    </div>
+    <h2> {{ Auth::user()->profile->username ?? 'ユーザー名' }}</h2>
 
     <button class="edit-btn">
       <a href="/mypage/profile">プロフィールを編集</a>
@@ -74,11 +78,13 @@ use Illuminate\Support\Str;
       <div class="items-wrapper">
         @forelse ($soldItems as $item)
         <div class="item-card">
-          @if (Str::startsWith($item->image_path, 'items/'))
+          @if (\Illuminate\Support\Str::startsWith($item->image_path, 'items/'))
           <img src="{{ asset('storage/' . $item->image_path) }}" alt="商品画像">
           @else
           <img src="{{ asset('images/' . $item->image_path) }}" alt="商品画像">
           @endif
+
+
           <p class="item-name">{{ $item->name }}</p>
         </div>
         @empty

@@ -37,7 +37,11 @@
       <h1 class="profile-title">プロフィール設定</h1>
 
       <div class="profile-image">
-        <div class="image-placeholder"></div>
+        <div class="image-placeholder">   @if(Auth::user()->profile && Auth::user()->profile->image_path)
+      <img
+        src="{{ asset('storage/' . Auth::user()->profile->image_path) }}"
+        alt="プロフィール画像">
+    @endif</div>
         <label class="image-upload-btn">
           画像を選択する
           <input type="file" name="profile_image" form="profileForm" hidden>

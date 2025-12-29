@@ -2,63 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ExhibitionRequest;
+use App\Http\Requests\CommentRequest;
+use App\Http\Requests\AddressRequest;
 use Illuminate\Http\Request;
 use App\Models\Exhibition;
-use App\Models\Like;
 use App\Models\Comment;
-use App\Models\Category;
 use App\Models\Condition;
 use App\Models\Purchase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Stripe\Stripe;
+use Stripe\Checkout\Session;
 
 class ItemController extends Controller
 {
-   public function index(Request $request)
-{
-    $userId  = auth()->id();
-    $tab     = $request->query('tab', 'recommend');
-    $keyword = $request->query('keyword');
+    public function index(Request $request)
+    {
+        $userId  = auth()->id();
+        $tab     = $request->query('tab', 'recommend');
+        $keyword = $request->query('keyword');
 
-    // ベースクエリ
-    $query = Exhibition::query();
+        // ベースクエリ
+        $query = Exhibition::query();
 
-    // マイリスト（イイネしたものだけ）
-    if ($tab === 'mylist' && auth()->check()) {
-        $query->whereHas('likes', function ($q) {
-            $q->where('user_id', auth()->id());
-        });
-    } else {
-        // 自分の出品は除外
-        if ($userId) {
-            $query->where('user_id', '!=', $userId);
-        }
-    }
-
-    // 検索（← ここが今まで mylist に効いてなかった）
-    if ($keyword) {
-        $keywords = preg_split('/\s+/u', $keyword);
-
-        $query->where(function ($q) use ($keywords) {
-            foreach ($keywords as $word) {
-                $q->orWhere('name', 'like', "%{$word}%");
+        // マイリスト（イイネしたものだけ）
+        if ($tab === 'mylist' && auth()->check()) {
+            $query->whereHas('likes', function ($q) {
+                $q->where('user_id', auth()->id());
+            });
+        } else {
+            // 自分の出品は除外
+            if ($userId) {
+                $query->where('user_id', '!=', $userId);
             }
-        });
+        }
+
+        // 検索（← ここが今まで mylist に効いてなかった）
+        if ($keyword) {
+            $keywords = preg_split('/\s+/u', $keyword);
+
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $word) {
+                    $q->orWhere('name', 'like', "%{$word}%");
+                }
+            });
+        }
+
+        $items = $query->latest()->get();
+
+        $boughtItemIds = auth()->check()
+            ? auth()->user()->purchases()->pluck('exhibition_id')->toArray()
+            : [];
+
+        return view('top', [
+            'exhibitions'    => $items,
+            'tab'            => $tab,
+            'boughtItemIds'  => $boughtItemIds,
+        ]);
     }
-
-    $items = $query->latest()->get();
-
-    $boughtItemIds = auth()->check()
-        ? auth()->user()->purchases()->pluck('exhibition_id')->toArray()
-        : [];
-
-    return view('top', [
-        'exhibitions'    => $items,
-        'tab'            => $tab,
-        'boughtItemIds'  => $boughtItemIds,
-    ]);
-}
 
     public function show($id)
     {
@@ -88,7 +91,7 @@ class ItemController extends Controller
         Auth::user()->likedExhibitions()->detach($id);
         return back();
     }
-    public function addComment(Request $request, Exhibition $item)
+    public function addComment(CommentRequest $request, Exhibition $item)
     {
         $request->validate([
             'content' => 'required|string|max:500',
@@ -119,29 +122,41 @@ class ItemController extends Controller
         $validated = $request->validate([
             'item_id' => 'required|exists:exhibitions,id',
             'payment_method' => 'required|string',
-            'shipping_name' => 'nullable|string',
-            'shipping_postal' => 'required|string',
-            'shipping_address' => 'required|string',
-            'shipping_building' => 'nullable|string',
-            'shipping_phone' => 'nullable|string',
             'total_price' => 'required|integer',
         ]);
 
-        Purchase::create([
-            'user_id' => auth()->id(),
-            'exhibition_id' => $validated['item_id'],
-            'payment_method' => $validated['payment_method'],
-            'shipping_name' => $validated['shipping_name'],
-            'shipping_postal' => $validated['shipping_postal'],
-            'shipping_address' => $validated['shipping_address'],
-            'shipping_building' => $validated['shipping_building'],
-            'shipping_phone' => $validated['shipping_phone'],
-            'total_price' => $validated['total_price'],
+        $item = Exhibition::findOrFail($validated['item_id']);
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        // 支払い方法を Stripe 用に変換
+        $paymentTypes = [];
+        if ($validated['payment_method'] === 'クレジットカード') {
+            $paymentTypes = ['card'];
+        } elseif ($validated['payment_method'] === 'コンビニ払い') {
+            $paymentTypes = ['konbini'];
+        }
+
+        // Stripe Checkout セッション作成
+        $session = Session::create([
+            'payment_method_types' => $paymentTypes,
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'jpy',
+                    'product_data' => [
+                        'name' => $item->name,
+                    ],
+                    'unit_amount' => $item->price,
+                ],
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'success_url' => route('top') . '?success=1',
+            'cancel_url' => route('item.show', $item->id),
         ]);
 
-        return redirect()->route('top')->with('success', '購入が完了しました！');
+        // Stripe の決済画面へ
+        return redirect($session->url);
     }
-
 
     public function edit($item_id)
     {
@@ -150,23 +165,27 @@ class ItemController extends Controller
         return view('purchase_address', compact('item', 'profile'));
     }
 
-    public function update(Request $request, $item_id)
+    public function update(AddressRequest $request, $item_id)
     {
-        $request->validate([
-            'postal_code' => 'required',
-            'address'     => 'required',
-            'building'    => 'nullable',
-        ]);
+        $validated = $request->validated();
 
-        $profile = auth()->user()->profile;
-        $profile->postal_code = $request->postal_code;
-        $profile->address     = $request->address;
-        $profile->building    = $request->building;
+        $user = auth()->user();
+        $profile = $user->profile ?? $user->profile()->create();
+
+        if ($request->hasFile('profile_image')) {
+            $profile->profile_image = $request
+                ->file('profile_image')
+                ->store('profile_images', 'public');
+        }
+        $profile->address     = $validated['address'];
+        $profile->building    = $validated['building'] ?? null;
+
         $profile->save();
 
-        return redirect()->route('purchase.show', ['item_id' => $item_id])
-            ->with('success', '配送先情報を更新しました。');
+        return redirect("/purchase/{$item_id}")
+            ->with('success', '住所を更新しました');
     }
+
     public function mypage(Request $request)
     {
         $page = $request->query('page', 'sell');
@@ -204,7 +223,7 @@ class ItemController extends Controller
         $conditions = Condition::all();
         return view('sell', compact('categories', 'conditions'));
     }
-    public function store(Request $request)
+    public function store(ExhibitionRequest $request)
     { {
             // バリデーション
             $validated = $request->validate([
