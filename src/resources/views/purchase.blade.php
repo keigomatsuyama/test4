@@ -65,12 +65,16 @@
 
           <form method="GET" action="{{ route('purchase.show', ['item_id' => $item->id]) }}">
             @csrf
-            <select name="payment_method" onchange="this.form.submit()">
-              <option value="">選択してください</option>
-              <option value="コンビニ払い" {{ $selected === 'コンビニ払い' ? 'selected' : '' }}>
+            <select name="payment_method" onchange="this.form.submit()" required>
+              <option value="" disabled {{ empty($selected) ? 'selected' : '' }}>
+                選択してください
+              </option>
+
+              <option value="konbini" {{ $selected === 'konbini' ? 'selected' : '' }}>
                 コンビニ払い
               </option>
-              <option value="クレジットカード" {{ $selected === 'クレジットカード' ? 'selected' : '' }}>
+
+              <option value="card" {{ $selected === 'card' ? 'selected' : '' }}>
                 クレジットカード
               </option>
             </select>
@@ -102,7 +106,7 @@
           </div>
           <div class="summary-row">
             <span class="label">支払い方法</span>
-            <span class="value">{{ $selected }}</span>
+            <span class="value">{{ $selectedLabel }}</span>
           </div>
         </div>
 
@@ -112,7 +116,7 @@
 
           <input type="hidden" name="item_id" value="{{ $item->id }}">
           <input type="hidden" name="total_price" value="{{ $item->price }}">
-          <input type="hidden" name="payment_method" value="{{ $selected ?? '' }}">
+          <input type="hidden" name="payment_method" value="{{ $selected }}">
 
           <input type="hidden" name="shipping_name" value="{{ $profile->name ?? Auth::user()->name ?? '未設定' }}">
           <input type="hidden" name="shipping_postal" value="{{ $profile->postal_code ?? '000-0000' }}">
@@ -122,7 +126,6 @@
 
           <button type="submit" class="purchase-btn">購入する</button>
         </form>
-
       </div>
 
     </main>

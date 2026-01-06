@@ -11,14 +11,14 @@ class CreateConditionsTable extends Migration
      *
      * @return void
      */
-   public function up()
-{
-    Schema::create('conditions', function (Blueprint $table) {
-        $table->id();
-        $table->string('condition');
-        $table->timestamps();
-    });
-}
+    public function up()
+    {
+        Schema::create('conditions', function (Blueprint $table) {
+            $table->id();
+            $table->string('condition');
+            $table->timestamps();
+        });
+    }
     /**
      * Reverse the migrations.
      *

@@ -38,28 +38,22 @@
       <a href="/sell" class="sell-btn">出品</a>
     </div>
   </header>
-
-
   <div class="tab-area">
     <a class="tab {{ $tab === 'recommend' ? 'active' : '' }}"
       href="{{ route('top', [
         'tab' => 'recommend',
         'keyword' => request('keyword')
-     ]) }}">
+    ]) }}">
       おすすめ
     </a>
-
     <a class="tab {{ $tab === 'mylist' ? 'active' : '' }}"
       href="{{ route('top', [
         'tab' => 'mylist',
         'keyword' => request('keyword')
-     ]) }}">
+    ]) }}">
       マイリスト
     </a>
   </div>
-
-
-
   <div class="products-area">
     @foreach ($exhibitions as $exhibition)
     <div class="product-card">

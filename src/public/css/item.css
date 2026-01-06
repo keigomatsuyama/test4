@@ -173,3 +173,8 @@ body {
   font-size: 25px;
   border-radius: 4px;
 }
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}

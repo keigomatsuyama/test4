@@ -114,5 +114,14 @@ return [
             resource_path('views/vendor/mail'),
         ],
     ],
-
+'smtp' => [
+    'transport' => 'smtp',
+    'host' => env('MAIL_HOST', '127.0.0.1'),
+    'port' => env('MAIL_PORT', 1025),
+    'encryption' => env('MAIL_ENCRYPTION', null),
+    'username' => env('MAIL_USERNAME', null),
+    'password' => env('MAIL_PASSWORD', null),
+    'timeout' => null,
+    'auth_mode' => null,
+],
 ];

@@ -93,10 +93,6 @@ class ItemController extends Controller
     }
     public function addComment(CommentRequest $request, Exhibition $item)
     {
-        $request->validate([
-            'content' => 'required|string|max:500',
-        ]);
-
         Comment::create([
             'user_id' => auth()->id(),
             'exhibition_id' => $item->id,  // ← item じゃなく exhibition カラムだけど名前は item で受ける
@@ -114,31 +110,28 @@ class ItemController extends Controller
         $profile = auth()->user()->profile;  // ← 常に最新住所を取得
 
         $selected = $request->payment_method; // 支払い方法GET反映
+   $paymentLabels = [
+        'card' => 'クレジットカード',
+        'konbini' => 'コンビニ払い',
+    ];
 
-        return view('purchase', compact('item', 'profile', 'selected'));
+    $selectedLabel = $paymentLabels[$selected] ?? '';
+
+        return view('purchase', compact('item', 'profile', 'selected', 'selectedLabel'));
     }
     public function purchasestore(Request $request)
     {
         $validated = $request->validate([
             'item_id' => 'required|exists:exhibitions,id',
-            'payment_method' => 'required|string',
-            'total_price' => 'required|integer',
+            'payment_method' => 'required|in:card,konbini',
         ]);
 
         $item = Exhibition::findOrFail($validated['item_id']);
-        Stripe::setApiKey(config('services.stripe.secret'));
 
-        // 支払い方法を Stripe 用に変換
-        $paymentTypes = [];
-        if ($validated['payment_method'] === 'クレジットカード') {
-            $paymentTypes = ['card'];
-        } elseif ($validated['payment_method'] === 'コンビニ払い') {
-            $paymentTypes = ['konbini'];
-        }
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 
-        // Stripe Checkout セッション作成
-        $session = Session::create([
-            'payment_method_types' => $paymentTypes,
+        $session = \Stripe\Checkout\Session::create([
+            'payment_method_types' => [$validated['payment_method']],
             'line_items' => [[
                 'price_data' => [
                     'currency' => 'jpy',
@@ -154,7 +147,6 @@ class ItemController extends Controller
             'cancel_url' => route('item.show', $item->id),
         ]);
 
-        // Stripe の決済画面へ
         return redirect($session->url);
     }
 

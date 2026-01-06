@@ -10,11 +10,17 @@ services:
       - ./src:/var/www
     depends_on:
       - php
+    networks:
+      - laravel-net
 
   php:
     build: ./docker/php
     volumes:
       - ./src:/var/www
+    depends_on:
+      - mailhog
+    networks:
+      - laravel-net
 
   mysql:
     image: mysql:8.0.26
@@ -28,6 +34,8 @@ services:
     volumes:
       - ./docker/mysql/data:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - laravel-net
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -40,3 +48,16 @@ services:
       - 8080:80
     depends_on:
       - mysql
+    networks:
+      - laravel-net
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - laravel-net
+
+networks:
+  laravel-net:

@@ -48,3 +48,6 @@ php artisan db:seed
 お問い合わせ：http://localhost/
 - ユーザー登録：http://localhost/register
 - phpMyAdmin:：http://localhost:8080/
+
+## 補足
+購入してsoldが付いた商品はクリックしても反応しないようにしている。

@@ -17,7 +17,7 @@ Route::post('/mypage/profile', [UserController::class, 'updateProfile'])
     ->name('profile.update');
 Route::get('/', [ItemController::class, 'index'])->name('top');
 Route::get('/item/{id}', [ItemController::class, 'show'])->name('item.show');
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth','verified'])->group(function () {
     Route::get('/mypage/profile', [UserController::class, 'profile'])->name('profile');
     Route::get('/mypage', [ItemController::class, 'myPage'])->name('mypage');
     Route::post('/items/{id}/like', [ItemController::class, 'like'])->name('items.like');
