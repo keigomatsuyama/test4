@@ -55,31 +55,34 @@
     </a>
   </div>
   <div class="products-area">
-    @foreach ($exhibitions as $exhibition)
-    <div class="product-card">
-      @php
-      $isBought = in_array($exhibition->id, $boughtItemIds);
-      @endphp
+  @foreach ($exhibitions as $exhibition)
+  <div class="product-card">
 
-      @if (!$isBought)
+    @php
+      $isSold = in_array($exhibition->id, $soldItemIds);
+    @endphp
+
+    @if (!$isSold)
       <a href="{{ route('item.show', ['id' => $exhibition->id]) }}">
+    @endif
+
+      <div class="product-image">
+        <img src="{{ asset('images/' . $exhibition->image_path) }}" alt="{{ $exhibition->name }}" width="150">
+      </div>
+
+      <p class="product-name">
+        {{ $exhibition->name }}
+        @if ($isSold)
+          <span style="color:red;">（SOLD）</span>
         @endif
+      </p>
 
-        <div class="product-image">
-          <img src="{{ asset('images/' . $exhibition->image_path) }}" alt="{{ $exhibition->name }}" width="150">
-        </div>
-        <p class="product-name">
-          {{ $exhibition->name }}
-          @if ($isBought)
-          <span style="color: red;">（SOLD）</span>
-          @endif
-        </p>
-
-        @if (!$isBought)
+    @if (!$isSold)
       </a>
-      @endif
-    </div>
-    @endforeach
+    @endif
+
+  </div>
+@endforeach
   </div>
 </body>
 

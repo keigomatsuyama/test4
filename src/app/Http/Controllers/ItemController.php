@@ -52,14 +52,12 @@ class ItemController extends Controller
 
         $items = $query->latest()->get();
 
-        $boughtItemIds = auth()->check()
-            ? auth()->user()->purchases()->pluck('exhibition_id')->toArray()
-            : [];
+$soldItemIds = Purchase::pluck('exhibition_id')->toArray();
 
         return view('top', [
             'exhibitions'    => $items,
             'tab'            => $tab,
-            'boughtItemIds'  => $boughtItemIds,
+            'soldItemIds'  => $soldItemIds,
         ]);
     }
 
@@ -198,13 +196,16 @@ class ItemController extends Controller
         }
 
         // 購入した商品一覧
-        if ($page === 'buy') {
-            $boughtItems = $user->purchases()
-                ->with('item')   // Purchase → Exhibition
-                ->get()
-                ->pluck('item')  // Exhibitionだけ取り出す
-                ->filter();      // 念のため null 除外
-        }
+       if ($page === 'buy') {
+    $boughtItems = $user->purchases()
+        ->with('item')
+        ->get()
+        ->pluck('item')
+        ->filter()
+        ->unique('id')   // ★ これを追加
+        ->values();      // インデックス整理（任意）
+}
+
 
         return view('mypage', compact('page', 'soldItems', 'boughtItems'));
     }
