@@ -1,6 +1,9 @@
+@php
+use Illuminate\Support\Str;
+@endphp
+
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,7 +47,12 @@
 
     <div class="item-image-block">
       <div class="item-image">
-        <img src="{{ asset('images/' . $item->image_path) }}" alt="{{ $item->name }}" width="300">
+      @if (Str::startsWith($item->image_path, 'items/'))
+  <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->name }}" class="item-image-img">
+@else
+  <img src="{{ asset('images/' . $item->image_path) }}" alt="{{ $item->name }}" class="item-image-img">
+@endif
+
       </div>
     </div>
 

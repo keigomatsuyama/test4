@@ -48,7 +48,7 @@
 
     <label>住所</label>
     <input type="text" name="address"
-           value="{{ old('address', $profile->address) }}">
+    value="{{ old('address', $profile->address) }}">
     @error('address')
         <p style="color:red;">{{ $message }}</p>
     @enderror

@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 // Fortify の login/register ページは自動なので不要
 // POST はあなたのコントローラでOK
-
+Route::get('/purchase/success', [ItemController::class, 'success'])
+    ->name('purchase.success');
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/logout', function () {

@@ -15,7 +15,7 @@ class ExhibitionRequest extends FormRequest
     {
         return [
             // 商品名
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string'],
 
             // 商品説明
             'description' => ['required', 'string', 'max:255'],

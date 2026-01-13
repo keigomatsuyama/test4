@@ -3,23 +3,17 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Database\Seeders\ExhibitionSeeder;
-use Database\Seeders\CategorySeeder;
+
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     *
-     * @return void
-     */
-    public function run()
+   public function run()
     {
-        // \App\Models\User::factory(10)->create();
         $this->call([
-            CategorySeeder::class,
-            ExhibitionSeeder::class,
-            CategoryExhibitionSeeder::class,
-            ConditionSeeder::class,
+            UserSeeder::class,               // ★ 0. Seeder専用ユーザー
+            ConditionSeeder::class,          // ① condition
+            CategorySeeder::class,           // ② category
+            ExhibitionSeeder::class,         // ③ exhibition（user_id=999）
+            CategoryExhibitionSeeder::class, // ④ 中間テーブル
         ]);
     }
 }

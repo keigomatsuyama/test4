@@ -34,7 +34,7 @@ class UserController extends Controller
         }
 
         return back()->withErrors([
-            'password' => 'メールアドレスまたはパスワードが正しくありません。',
+            'password' => 'ログイン情報が登録されていません。',
         ]);
     }
 

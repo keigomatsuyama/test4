@@ -18,48 +18,50 @@ use Stripe\Checkout\Session;
 
 class ItemController extends Controller
 {
-    public function index(Request $request)
-    {
-        $userId  = auth()->id();
-        $tab     = $request->query('tab', 'recommend');
-        $keyword = $request->query('keyword');
+   public function index(Request $request)
+{
+    $tab     = $request->query('tab', 'recommend');
+    $keyword = $request->query('keyword');
 
-        // ベースクエリ
-        $query = Exhibition::query();
+    $query = Exhibition::query();
 
-        // マイリスト（イイネしたものだけ）
-        if ($tab === 'mylist' && auth()->check()) {
-            $query->whereHas('likes', function ($q) {
-                $q->where('user_id', auth()->id());
-            });
-        } else {
-            // 自分の出品は除外
-            if ($userId) {
-                $query->where('user_id', '!=', $userId);
-            }
-        }
-
-        // 検索（← ここが今まで mylist に効いてなかった）
-        if ($keyword) {
-            $keywords = preg_split('/\s+/u', $keyword);
-
-            $query->where(function ($q) use ($keywords) {
-                foreach ($keywords as $word) {
-                    $q->orWhere('name', 'like', "%{$word}%");
-                }
-            });
-        }
-
-        $items = $query->latest()->get();
-
-$soldItemIds = Purchase::pluck('exhibition_id')->toArray();
-
-        return view('top', [
-            'exhibitions'    => $items,
-            'tab'            => $tab,
-            'soldItemIds'  => $soldItemIds,
-        ]);
+    // ★ ログイン中は「自分の出品」を除外
+    if (auth()->check()) {
+        $query->where('user_id', '!=', auth()->id());
     }
+
+    // マイリスト
+    if ($tab === 'mylist' && auth()->check()) {
+        $query->whereHas('likes', function ($q) {
+            $q->where('user_id', auth()->id());
+        });
+    }
+
+    // キーワード検索
+    if ($keyword) {
+        $keywords = preg_split('/\s+/u', $keyword);
+        $query->where(function ($q) use ($keywords) {
+            foreach ($keywords as $word) {
+                $q->where('name', 'like', "%{$word}%");
+            }
+        });
+    }
+$query->orderByRaw(
+        'CASE WHEN exhibitions.id IN (SELECT exhibition_id FROM purchases) THEN 1 ELSE 0 END'
+    );
+    $items = $query
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    $soldItemIds = Purchase::pluck('exhibition_id')->toArray();
+
+    return view('top', [
+        'exhibitions' => $items,
+        'tab' => $tab,
+        'soldItemIds' => $soldItemIds,
+    ]);
+}
+
 
     public function show($id)
     {
@@ -108,45 +110,71 @@ $soldItemIds = Purchase::pluck('exhibition_id')->toArray();
         $profile = auth()->user()->profile;  // ← 常に最新住所を取得
 
         $selected = $request->payment_method; // 支払い方法GET反映
-   $paymentLabels = [
-        'card' => 'クレジットカード',
-        'konbini' => 'コンビニ払い',
-    ];
+        $paymentLabels = [
+            'card' => 'カード払い',
+            'konbini' => 'コンビニ払い',
+        ];
 
-    $selectedLabel = $paymentLabels[$selected] ?? '';
+        $selectedLabel = $paymentLabels[$selected] ?? '';
 
         return view('purchase', compact('item', 'profile', 'selected', 'selectedLabel'));
     }
-    public function purchasestore(Request $request)
-    {
-        $validated = $request->validate([
-            'item_id' => 'required|exists:exhibitions,id',
-            'payment_method' => 'required|in:card,konbini',
-        ]);
+   public function purchasestore(Request $request)
+{
+    $validated = $request->validate([
+        'item_id' => 'required|exists:exhibitions,id',
+        'payment_method' => 'required|in:card,konbini',
+    ]);
 
-        $item = Exhibition::findOrFail($validated['item_id']);
+    $item = Exhibition::findOrFail($validated['item_id']);
 
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+    \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 
-        $session = \Stripe\Checkout\Session::create([
-            'payment_method_types' => [$validated['payment_method']],
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'jpy',
-                    'product_data' => [
-                        'name' => $item->name,
-                    ],
-                    'unit_amount' => $item->price,
+    $session = \Stripe\Checkout\Session::create([
+        'payment_method_types' => [$validated['payment_method']],
+        'line_items' => [[
+            'price_data' => [
+                'currency' => 'jpy',
+                'product_data' => [
+                    'name' => $item->name,
                 ],
-                'quantity' => 1,
-            ]],
-            'mode' => 'payment',
-            'success_url' => route('top') . '?success=1',
-            'cancel_url' => route('item.show', $item->id),
-        ]);
+                'unit_amount' => $item->price,
+            ],
+            'quantity' => 1,
+        ]],
+        'mode' => 'payment',
+        'success_url' => route('purchase.success') . '?item_id=' . $item->id,
+        'cancel_url' => route('item.show', $item->id),
+    ]);
 
-        return redirect($session->url);
+    // ★ここで Stripe に飛ばす
+    return redirect($session->url);
+}
+public function success(Request $request)
+{
+    $item = Exhibition::findOrFail($request->item_id);
+    $profile = auth()->user()->profile;
+
+    // 二重購入防止
+    if (Purchase::where('exhibition_id', $item->id)->exists()) {
+        return redirect()->route('top');
     }
+
+    Purchase::create([
+        'user_id'           => auth()->id(),
+        'exhibition_id'     => $item->id,
+        'payment_method'    => 'card',
+        'shipping_name'     => $profile->username ?? auth()->user()->name,
+        'shipping_postal'   => $profile->postal_code ?? '000-0000',
+        'shipping_address'  => $profile->address ?? '未設定',
+        'shipping_building' => $profile->building,
+        'shipping_phone'    => $profile->phone ?? '0000000000',
+        'total_price'       => $item->price,
+    ]);
+
+    return redirect()->route('top')
+        ->with('success', '購入が完了しました');
+}
 
     public function edit($item_id)
     {
@@ -176,39 +204,20 @@ $soldItemIds = Purchase::pluck('exhibition_id')->toArray();
             ->with('success', '住所を更新しました');
     }
 
-    public function mypage(Request $request)
-    {
-        $page = $request->query('page', 'sell');
+   public function mypage(Request $request)
+{
+    $page = $request->query('page', 'sell');
 
-        if (!in_array($page, ['sell', 'buy'], true)) {
-            abort(404);
-        }
-
-        $user = auth()->user();
-
-        // 常に Collection を渡す
-        $soldItems = collect();
-        $boughtItems = collect();
-
-        // 出品した商品一覧
-        if ($page === 'sell') {
-            $soldItems = $user->exhibitions()->get();
-        }
-
-        // 購入した商品一覧
-       if ($page === 'buy') {
-    $boughtItems = $user->purchases()
-        ->with('item')
-        ->get()
-        ->pluck('item')
-        ->filter()
-        ->unique('id')   // ★ これを追加
-        ->values();      // インデックス整理（任意）
-}
-
-
-        return view('mypage', compact('page', 'soldItems', 'boughtItems'));
+    if ($page === 'sell') {
+        $sellingItems = Exhibition::where('user_id', Auth::id())->get();
+        $boughtItems  = collect();
+    } else {
+        $sellingItems = collect();
+        $boughtItems  = Purchase::where('user_id', Auth::id())->get();
     }
+
+    return view('mypage', compact('page', 'sellingItems', 'boughtItems'));
+}
 
     public function sell()
     {

@@ -1,7 +1,8 @@
-<!-- purchase.blade.php -->
+@php
+use Illuminate\Support\Str;
+@endphp
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,10 +51,17 @@
       <div class="left">
 
         <div class="item-info">
-          <img src="{{ asset('images/' . $item->image_path) }}"
-            alt="{{ $item->name }}"
-            class="product-image">
-
+  @if (Str::startsWith($item->image_path, 'items/'))
+    <img
+      src="{{ asset('storage/' . $item->image_path) }}"
+      alt="{{ $item->name }}"
+      class="product-image">
+  @else
+    <img
+      src="{{ asset('images/' . $item->image_path) }}"
+      alt="{{ $item->name }}"
+      class="product-image">
+  @endif
           <div class="item-text">
             <h1>{{ $item->name }}</h1>
             <p class="price">¥{{ number_format($item->price) }}</p>
@@ -75,7 +83,7 @@
               </option>
 
               <option value="card" {{ $selected === 'card' ? 'selected' : '' }}>
-                クレジットカード
+                カード払い
               </option>
             </select>
           </form>

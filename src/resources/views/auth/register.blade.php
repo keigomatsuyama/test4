@@ -33,6 +33,9 @@
 @enderror
       <label for="password-confirmation">確認用パスワード</label>
       <input type="text" id="password-confirmation" name="password_confirmation"  />
+@error('password')
+    <div class="error-message">{{ $message }}</div>
+@enderror
       <button type="submit">登録する</button>
     </form>
 

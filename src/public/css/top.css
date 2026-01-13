@@ -84,11 +84,10 @@ body {
     margin: 0 auto;
 }
 
-.product-card a{
+.product-card {
     width: 260px;
-    text-decoration: none;
-    color: #000;
 }
+
 
 .product-image {
     width: 260px;

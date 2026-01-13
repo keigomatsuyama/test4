@@ -25,7 +25,7 @@ class ProfileRequest extends FormRequest
 
             'address' => 'required|string',
 
-            'building' => 'required|string|max:255', // 建物必須！！
+            'building' => 'required|string|max:255'
         ];
     }
 
