@@ -57,7 +57,6 @@ body {
 .tab-area {
     display: flex;
     padding: 10px 50px;
-    border-bottom: 3px;
     margin-top: 5px;
     gap: 40px;
 }
@@ -88,6 +87,10 @@ body {
     width: 260px;
 }
 
+.product-card a {
+    text-decoration: none;
+    color: inherit;
+}
 
 .product-image {
     width: 260px;

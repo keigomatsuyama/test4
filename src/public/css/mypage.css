@@ -86,11 +86,11 @@ body {
     margin-top: 10px;
     cursor: pointer;
     font-size: 26px;
+    text-decoration: none;
 }
 
 .edit-btn a {
     color: red;
-    text-decoration: none;
 }
 
 /* ===== Tabs ===== */
@@ -113,7 +113,6 @@ body {
 /* ★ 選択中タブ（写真どおり） */
 .tabs .tab-label.active {
     color: red;
-    border-bottom: 2px solid red;
 }
 
 /* ===== Content ===== */
