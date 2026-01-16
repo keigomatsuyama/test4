@@ -65,6 +65,8 @@ body {
     text-decoration: none;
     color: #555;
     font-size: 24px;
+     display: inline-block;   /* ← これ */
+    white-space: nowrap; 
 }
 
 .tab.active {

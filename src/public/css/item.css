@@ -161,6 +161,15 @@ body {
   border-radius: 50%;
   margin-right: 10px;
 }
+.comment-user-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.comment-content {
+  flex: 1;
+}
 
 .username {
   font-weight: bold;
@@ -173,7 +182,9 @@ body {
   margin-bottom: 15px;
   padding: 8px;
 }
-
+.comment-text {
+  margin: 5px 0 0;
+}
 .comment-submit {
   background: #ff6f6f;
   color: white;

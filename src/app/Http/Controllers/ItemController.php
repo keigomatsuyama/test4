@@ -22,7 +22,15 @@ class ItemController extends Controller
 {
     $tab     = $request->query('tab', 'recommend');
     $keyword = $request->query('keyword');
+  $canShowMylist = false;
 
+    if (
+        $tab === 'mylist'
+        && auth()->check()
+        && auth()->user()->hasVerifiedEmail()
+    ) {
+        $canShowMylist = true;
+    }
     $query = Exhibition::query();
 
     // ★ ログイン中は「自分の出品」を除外
@@ -31,11 +39,20 @@ class ItemController extends Controller
     }
 
     // マイリスト
-    if ($tab === 'mylist' && auth()->check()) {
-        $query->whereHas('likes', function ($q) {
-            $q->where('user_id', auth()->id());
-        });
-    }
+   // マイリスト（ログイン ＋ メール認証済みのみ）
+   if ($tab === 'mylist' && auth()->check() && !auth()->user()->hasVerifiedEmail()) {
+    abort(403); // または redirect
+}
+if (
+    $tab === 'mylist'
+    && auth()->check()
+    && auth()->user()->hasVerifiedEmail()
+) {
+    $query->whereHas('likes', function ($q) {
+        $q->where('user_id', auth()->id());
+    });
+}
+
 
     // キーワード検索
     if ($keyword) {
@@ -59,6 +76,7 @@ $query->orderByRaw(
         'exhibitions' => $items,
         'tab' => $tab,
         'soldItemIds' => $soldItemIds,
+        'canShowMylist' => $canShowMylist,
     ]);
 }
 

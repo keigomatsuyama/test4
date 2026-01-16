@@ -40,6 +40,7 @@ use Illuminate\Support\Str;
   </div>
 </header>
 
+{{-- タブ --}}
 <div class="tab-area">
   <a class="tab {{ $tab === 'recommend' ? 'active' : '' }}"
      href="{{ route('top', ['tab'=>'recommend','keyword'=>request('keyword')]) }}">
@@ -50,41 +51,40 @@ use Illuminate\Support\Str;
     マイリスト
   </a>
 </div>
+
+{{-- 商品一覧 --}}
 <div class="products-area">
-@foreach ($exhibitions as $exhibition)
-  @php
-    $isSold = in_array($exhibition->id, $soldItemIds);
-  @endphp
 
-  <div class="product-card">
+  {{-- ★ 未ログイン × マイリスト → 何も表示しない --}}
+  @if (!($tab === 'mylist' && !auth()->check()))
+    @foreach ($exhibitions as $exhibition)
+      @php
+        $isSold = in_array($exhibition->id, $soldItemIds);
+      @endphp
 
-    @if (!$isSold)
-      <a href="{{ route('item.show', ['id'=>$exhibition->id]) }}">
-    @endif
+      <div class="product-card">
+        @if (!$isSold)
+          <a href="{{ route('item.show', ['id'=>$exhibition->id]) }}">
+        @endif
 
-      <div class="product-image">
-        @if (Str::startsWith($exhibition->image_path, 'items/'))
-          <img src="{{ asset('storage/'.$exhibition->image_path) }}" alt="{{ $exhibition->name }}">
-        @else
-          <img src="{{ asset('images/'.$exhibition->image_path) }}" alt="{{ $exhibition->name }}">
+          <div class="product-image">
+            @if (Str::startsWith($exhibition->image_path, 'items/'))
+              <img src="{{ asset('storage/'.$exhibition->image_path) }}">
+            @else
+              <img src="{{ asset('images/'.$exhibition->image_path) }}">
+            @endif
+          </div>
+
+          <p class="product-name">{{ $exhibition->name }}</p>
+
+        @if (!$isSold)
+          </a>
         @endif
       </div>
+    @endforeach
+  @endif
 
-      <p class="product-name">
-        {{ $exhibition->name }}
-        @if ($isSold)
-          <span style="color:red;">（SOLD）</span>
-        @endif
-      </p>
-
-    @if (!$isSold)
-      </a>
-    @endif
-
-  </div>
-@endforeach
 </div>
-</main>
-</div>
+
 </body>
 </html>

@@ -116,15 +116,35 @@ use Illuminate\Support\Str;
         <h2>コメント({{ $item->comments->count() }})</h2>
 
         {{-- コメント一覧 --}}
-        @foreach($item->comments as $comment)
-        <div class="comment-box">
-          <div class="icon"></div>
-          <div>
-            <p class="username">{{ $comment->user->name }}</p>
-            <p class="comment-text">{{ $comment->content }}</p>
-          </div>
-        </div>
-        @endforeach
+      @foreach($item->comments as $comment)
+<div class="comment-box">
+
+  {{-- ユーザー画像 --}}
+  <div class="icon">
+    @if ($comment->user->profile && $comment->user->profile->profile_image)
+      <img
+        src="{{ asset('storage/' . $comment->user->profile->profile_image) }}"
+        alt="{{ $comment->user->name }}"
+        class="comment-user-icon"
+      >
+    @else
+      <img
+        src="{{ asset('images/default-user.png') }}"
+        alt="default user"
+        class="comment-user-icon"
+      >
+    @endif
+  </div>
+
+  {{-- コメント本文 --}}
+  <div class="comment-content">
+    <p class="username">{{ $comment->user->name }}</p>
+    <p class="comment-text">{{ $comment->content }}</p>
+  </div>
+
+</div>
+@endforeach
+
 
         {{-- コメント投稿フォーム --}}
         <h3 class="comment-title">商品へのコメント</h3>
