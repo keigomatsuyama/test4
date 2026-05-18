@@ -60,4 +60,38 @@ class User extends Authenticatable implements \Illuminate\Contracts\Auth\MustVer
     {
         return $this->hasMany(Purchase::class);
     }
+    public function averageRating()
+{
+    // 出品者として貰った評価
+    $sellerRatings =
+        Transaction::where(
+            'seller_id',
+            $this->id
+        )
+        ->whereNotNull('buyer_rating')
+        ->pluck('buyer_rating');
+
+    // 購入者として貰った評価
+    $buyerRatings =
+        Transaction::where(
+            'buyer_id',
+            $this->id
+        )
+        ->whereNotNull('seller_rating')
+        ->pluck('seller_rating');
+
+    $ratings =
+        $sellerRatings->merge($buyerRatings);
+
+    // 評価なし
+    if($ratings->count() === 0)
+    {
+        return null;
+    }
+
+    // 平均を四捨五入
+    return round(
+        $ratings->avg()
+    );
+}
     }

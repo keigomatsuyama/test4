@@ -19,8 +19,7 @@ use Illuminate\Support\Str;
           <img src="{{ asset('images/logo.png') }}" alt="ロゴ">
         </a>
       </div>
-
-
+    </header>
       <div class="header-center">
         <form action="{{ route('top') }}" method="GET">
           <input

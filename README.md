@@ -35,6 +35,37 @@ php artisan migrate
 ``` bash
 php artisan db:seed
 ```
+8. ダミーデータ
+
+### ログイン情報
+
+| メールアドレス | パスワード |
+|---|---|
+| seller1@test.com | password |
+| seller2@test.com | password |
+| user3@test.com | password |
+
+### 商品データ
+
+- seller1 が C001〜C005 を出品
+- seller2 が C006〜C010 を出品
+- user3 は商品未出品
+
+### 商品一覧
+
+| 商品ID | 商品名 | 出品者 |
+|---|---|---|
+| C001 | 腕時計 | seller1 |
+| C002 | HDD | seller1 |
+| C003 | 玉ねぎ3束 | seller1 |
+| C004 | 革靴 | seller1 |
+| C005 | ノートPC | seller1 |
+| C006 | マイク | seller2 |
+| C007 | ショルダーバッグ | seller2 |
+| C008 | タンブラー | seller2 |
+| C009 | コーヒーミル | seller2 |
+| C010 | メイクセット | seller2 |
+
 ## 使用技術(実行環境)
 - PHP8.3.6
 - Laravel8.83.8

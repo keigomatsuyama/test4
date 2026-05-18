@@ -18,9 +18,13 @@ Route::post('/mypage/profile', [UserController::class, 'updateProfile'])
     ->name('profile.update');
 Route::get('/', [ItemController::class, 'index'])->name('top');
 Route::get('/item/{id}', [ItemController::class, 'show'])->name('item.show');
-Route::middleware(['auth','verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/mypage/profile', [UserController::class, 'profile'])->name('profile');
     Route::get('/mypage', [ItemController::class, 'myPage'])->name('mypage');
+    Route::get(
+    '/transactions/{transaction}',
+    [ItemController::class, 'transactionShow']
+)->name('transactions.show');
     Route::post('/items/{id}/like', [ItemController::class, 'like'])->name('items.like');
     Route::delete('/items/{id}/unlike', [ItemController::class, 'unlike'])->name('items.unlike');
     Route::post(
@@ -39,4 +43,26 @@ Route::middleware(['auth','verified'])->group(function () {
 
     Route::get('/sell', [ItemController::class, 'sell'])->name('item.sell');
     Route::post('/items', [ItemController::class, 'store'])->name('items.store');
+    Route::post(
+    '/transactions/{id}/message',
+    [ItemController::class, 'messageStore']
+)->name('message.store');
+Route::get(
+    '/message/{message}/edit',
+    [ItemController::class, 'messageEdit']
+)->name('message.edit');
+
+Route::put(
+    '/message/{message}',
+    [ItemController::class, 'messageUpdate']
+)->name('message.update');
+
+Route::delete(
+    '/message/{message}',
+    [ItemController::class, 'messageDestroy']
+)->name('message.destroy');
+Route::post(
+    '/reviews/{transaction}',
+    [ItemController::class, 'reviewstore']
+)->name('reviews.store');
 });

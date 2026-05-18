@@ -53,14 +53,52 @@ body {
 
 /* ===== Profile ===== */
 .profile {
-    text-align: center;
     padding: 20px;
     font-size: 36px;
 }
+.profile-header
+{
+    display: flex;
 
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-top: 40px;
+
+    padding: 0 120px;
+}
+
+.profile-left
+{
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+}
+.profile-info
+{
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    gap: 10px;
+}
+.profile-info h2
+{
+    margin: 0;
+}
+.rating-stars {
+    display: flex;
+
+    gap: 5px;
+}
 .avatar {
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
     background-color: #d9d9d9;
     overflow: hidden;
@@ -126,17 +164,47 @@ body {
     flex-wrap: wrap;
     gap: 40px;
     margin-top: 30px;
+    justify-content: flex-start;
 }
 
 .item-card {
     width: 200px;
-    text-align: center;
+    text-align: relative;
 }
+.item-link {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    color: black;
+}
+.item-badge {
+    position: absolute;
 
+    top: 8px;
+    left: 8px;
+
+    width: 22px;
+    height: 22px;
+
+    border-radius: 50%;
+
+    background: #ff3b30;
+    color: white;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 10;
+}
 .item-card img {
     width: 200px;
     height: 200px;
     object-fit: cover;
+    display: block;
     background: #ddd;
 }
 
@@ -149,8 +217,47 @@ body {
     margin-top: 5px;
     font-size: 25px;
 }
+.tab-badge {
+    display: inline-flex;
 
+    width: 20px;
+    height: 20px;
+
+    border-radius: 50%;
+
+    background: #ff3b30;
+    color: white;
+
+    font-size: 24px;
+    font-weight: bold;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-left: 4px;
+}
+.transaction-user {
+    font-size: 20px;
+
+    text-align: center;
+
+    margin-top: 10px;
+
+    word-break: keep-all;
+}
 .empty-message {
     margin-top: 20px;
     color: #666;
+}
+.rating-stars {
+    margin-top: 5px;
+}
+
+.star {
+    font-size: 28px;
+    color: #d9d9d9;
+}
+
+.star.filled {
+    color: #ffe100;
 }
