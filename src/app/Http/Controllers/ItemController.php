@@ -74,9 +74,19 @@ class ItemController extends Controller
         $query->orderByRaw(
             'CASE WHEN exhibitions.id IN (SELECT exhibition_id FROM purchases) THEN 1 ELSE 0 END'
         );
-        $items = $query
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $completedItemIds =
+    Transaction::where(
+        'status',
+        'completed'
+    )->pluck('item_id');
+
+$items = $query
+    ->whereNotIn(
+        'id',
+        $completedItemIds
+    )
+    ->orderBy('created_at', 'desc')
+    ->get();
 
         $soldItemIds = Purchase::pluck('exhibition_id')->toArray();
 
@@ -378,16 +388,33 @@ public function update(Request $request, $item_id)
 
         if ($page === 'sell') {
 
-            $sellingItems = Exhibition::where(
-                'user_id',
-                Auth::id()
-            )->get();
+           $sellingItems = Exhibition::where(
+    'user_id',
+    Auth::id()
+)
+->whereNotIn(
+    'id',
+    Transaction::where(
+        'status',
+        'completed'
+    )->pluck('item_id')
+)
+->get();
+
         } elseif ($page === 'buy') {
 
-            $boughtItems = Purchase::where(
-                'user_id',
-                Auth::id()
-            )->get();
+           $boughtItems = Purchase::where(
+    'user_id',
+    Auth::id()
+)
+->whereNotIn(
+    'exhibition_id',
+    Transaction::where(
+        'status',
+        'completed'
+    )->pluck('item_id')
+)
+->get();
         } elseif ($page === 'transaction') {
             $transactions = Transaction::with([
                 'item',
