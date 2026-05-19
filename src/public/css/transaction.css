@@ -231,7 +231,36 @@ body {
 }
 
 /* ================= 編集削除 ================= */
+.edit-form {
+    display: none;
+    flex-direction: column;
 
+    gap: 10px;
+
+    margin-bottom: 30px;
+}
+
+.edit-input {
+    background: #d9d9d9;
+
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 20px;
+
+    font-size: 16px;
+
+    width: 100%;
+
+    box-sizing: border-box;
+}
+
+.edit-save-btn {
+    align-self: flex-end;
+    padding: 10px 20px;
+    cursor: pointer;
+}
 .message-actions {
     display: flex;
 
@@ -360,4 +389,19 @@ body {
 .error-message {
     color: red;
     font-size: 14px;
+}
+.send-button {
+    background: transparent;
+
+    border: none;
+
+    font-size: 38px;
+
+    color: #999;
+
+    cursor: pointer;
+
+    padding: 0;
+
+    margin-left: 15px;
 }

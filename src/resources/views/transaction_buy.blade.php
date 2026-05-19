@@ -127,7 +127,23 @@
               {{ $message->user->profile->username ?? 'ユーザー名' }}
             </span>
 
-            <div class="message-avatar"></div>
+           <div class="message-avatar">
+
+    @if($message->user->profile?->profile_image)
+
+        <img
+            src="{{ asset('storage/' . $message->user->profile->profile_image) }}"
+            alt=""
+            style="
+                width:50px;
+                height:50px;
+                border-radius:50%;
+                object-fit:cover;
+            ">
+
+    @endif
+
+</div>
 
           </div>
 
@@ -153,7 +169,8 @@
             action="{{ route('message.update', $message->id) }}"
             method="POST"
               enctype="multipart/form-data"
-            style="display:none;">
+            style="display:none;"
+            class="edit-form">
 
             @csrf
             @method('PUT')
@@ -161,7 +178,8 @@
             <input
               type="text"
               name="message"
-              value="{{ $message->message }}">
+              value="{{ $message->message }}"
+              class="edit-input">
  <input
     type="file"
     name="image">
@@ -190,7 +208,8 @@
   </label>
 
   @endif
-            <button type="submit">
+            <button type="submit"
+            class="edit-save-btn">
               保存
             </button>
 

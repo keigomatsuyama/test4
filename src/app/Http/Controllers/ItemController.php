@@ -148,6 +148,33 @@ class ItemController extends Controller
         return back();
     }
 
+public function edit($item_id)
+{
+    $item = Exhibition::findOrFail($item_id);
+
+    $profile = auth()->user()->profile;
+
+    return view('purchase_address', compact('item', 'profile'));
+}
+
+public function update(Request $request, $item_id)
+{
+    $request->validate([
+        'postal_code' => 'required',
+        'address' => 'required',
+        'building' => 'nullable',
+    ]);
+
+    $profile = auth()->user()->profile;
+
+    $profile->update([
+        'postal_code' => $request->postal_code,
+        'address' => $request->address,
+        'building' => $request->building,
+    ]);
+
+   return redirect()->route('purchase.show', ['item_id' => $item_id]);
+}
     public function purchase(Request $request, $item_id)
     {
         session(['purchase_item_id' => $item_id]); // 購入中の商品IDを保持

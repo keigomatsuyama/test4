@@ -54,36 +54,37 @@
         {{-- ================= 右側 ================= --}}
         <main class="transaction-main">
 
-            {{-- header --}}
+            {{-- ================= header ================= --}}
             <div class="transaction-header">
 
                 <div class="transaction-user">
 
-                    <div class="user-avatar"></div>
+                    <div class="user-avatar">
+
+                        @if($partner->profile?->profile_image)
+
+                        <img
+                            src="{{ asset('storage/' . $partner->profile->profile_image) }}"
+                            style="
+                                width:60px;
+                                height:60px;
+                                border-radius:50%;
+                                object-fit:cover;
+                            ">
+
+                        @endif
+
+                    </div>
 
                     <h2>
                         「{{ $partner->profile->username ?? 'ユーザー名' }}」さんとの取引画面
                     </h2>
 
                 </div>
-{{-- 出品者 --}}
-@if(
-    Auth::id() == $transaction->seller_id
-    &&
-    $transaction->status === 'buyer_completed'
-    &&
-    !$transaction->seller_rating
-)
 
-<script>
-    window.onload = function () {
-        document.getElementById('review-modal').style.display = 'block';
-    }
-</script>
-@endif
             </div>
 
-            {{-- 商品情報 --}}
+            {{-- ================= 商品情報 ================= --}}
             <div class="transaction-item">
 
                 @if(Str::startsWith($transaction->item->image_path, 'items/'))
@@ -114,14 +115,14 @@
 
             </div>
 
-            {{-- メッセージ一覧 --}}
+            {{-- ================= メッセージ一覧 ================= --}}
             <div class="messages">
 
                 @foreach($messages as $message)
 
                 @if($message->user_id === Auth::id())
 
-                {{-- 自分 --}}
+                {{-- ================= 自分 ================= --}}
                 <div class="message-right-wrap">
 
                     <div class="message-user-right">
@@ -130,7 +131,22 @@
                             {{ $message->user->profile->username ?? 'ユーザー名' }}
                         </span>
 
-                        <div class="message-avatar"></div>
+                        <div class="message-avatar">
+
+                            @if($message->user->profile?->profile_image)
+
+                            <img
+                                src="{{ asset('storage/' . $message->user->profile->profile_image) }}"
+                                style="
+                                            width:50px;
+                                            height:50px;
+                                            border-radius:50%;
+                                            object-fit:cover;
+                                        ">
+
+                            @endif
+
+                        </div>
 
                     </div>
 
@@ -141,6 +157,18 @@
 
                         {{ $message->message }}
 
+                        @if($message->image_path)
+
+                        <img
+                            src="{{ asset('storage/' . $message->image_path) }}"
+                            style="
+                                        max-width:200px;
+                                        margin-top:10px;
+                                        border-radius:10px;
+                                    ">
+
+                        @endif
+
                     </div>
 
                     {{-- 編集フォーム --}}
@@ -148,18 +176,67 @@
                         id="edit-form-{{ $message->id }}"
                         action="{{ route('message.update', $message->id) }}"
                         method="POST"
-                        style="display:none;">
+                        enctype="multipart/form-data"
+                        style="display:none;"
+                        class="edit-form">
 
                         @csrf
                         @method('PUT')
 
+                        {{-- メッセージ --}}
                         <input
                             type="text"
                             name="message"
-                            value="{{ $message->message }}">
+                            value="{{ $message->message }}"
+                            class="edit-input">
 
-                        <button type="submit">
+                        {{-- 新画像 --}}
+                        <input
+                            type="file"
+                            name="image">
+
+                        {{-- 現在画像 --}}
+                        @if($message->image_path)
+
+                        <div style="margin-top:10px;">
+
+                            <img
+                                src="{{ asset('storage/' . $message->image_path) }}"
+                                style="
+                                            max-width:120px;
+                                            margin-top:10px;
+                                            border-radius:10px;
+                                        ">
+
+                        </div>
+
+                        {{-- 画像削除 --}}
+                        <label
+                            style="
+                                        display:block;
+                                        margin-top:10px;
+                                    ">
+
+                            <input
+                                type="checkbox"
+                                name="delete_image"
+                                value="1">
+
+                            画像を削除
+
+                        </label>
+
+                        @endif
+
+                        <button
+                            type="submit"
+                            style="
+                                    margin-top:10px;
+                                "
+                                class="edit-save-btn">
+
                             保存
+
                         </button>
 
                     </form>
@@ -202,12 +279,27 @@
 
                 @else
 
-                {{-- 相手 --}}
+                {{-- ================= 相手 ================= --}}
                 <div class="message-left-wrap">
 
                     <div class="message-user-left">
 
-                        <div class="message-avatar"></div>
+                        <div class="message-avatar">
+
+                            @if($message->user->profile?->profile_image)
+
+                            <img
+                                src="{{ asset('storage/' . $message->user->profile->profile_image) }}"
+                                style="
+                                            width:50px;
+                                            height:50px;
+                                            border-radius:50%;
+                                            object-fit:cover;
+                                        ">
+
+                            @endif
+
+                        </div>
 
                         <span>
                             {{ $message->user->profile->username ?? 'ユーザー名' }}
@@ -215,9 +307,22 @@
 
                     </div>
 
+                    {{-- 相手メッセージ --}}
                     <div class="message-left">
 
                         {{ $message->message }}
+
+                        @if($message->image_path)
+
+                        <img
+                            src="{{ asset('storage/' . $message->image_path) }}"
+                            style="
+                                        max-width:200px;
+                                        margin-top:10px;
+                                        border-radius:10px;
+                                    ">
+
+                        @endif
 
                     </div>
 
@@ -229,27 +334,7 @@
 
             </div>
 
-            {{-- 入力欄 --}}
-            
-      <div class="message-errors">
-
-    @error('message')
-
-    <p class="error-message">
-        {{ $message }}
-    </p>
-
-    @enderror
-
-    @error('image')
-
-    <p class="error-message">
-        {{ $message }}
-    </p>
-
-    @enderror
-
-</div>
+            {{-- ================= 入力欄 ================= --}}
             <form
                 action="{{ route('message.store', $transaction->id) }}"
                 method="POST"
@@ -283,171 +368,179 @@
                 </button>
 
             </form>
+            {{-- ================= 評価モーダル ================= --}}
+            <div
+                id="review-modal"
+                style="
+        display:none;
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.5);
+        z-index:99999;
+    ">
 
-        </main>
-
-    </div>
-
-
-    {{-- ================= レビューモーダル ================= --}}
-
-    <div
-        id="review-modal"
-        style="
-            display:none;
-            position:fixed;
-            top:0;
-            left:0;
-            width:100%;
-            height:100%;
-            background:rgba(0,0,0,0.5);
-            z-index:99999;
+                <div
+                    style="
+            width:520px;
+            background:#f6f3e7;
+            margin:120px auto;
+            border-radius:8px;
+            overflow:hidden;
+            border:1px solid #999;
         ">
 
-        <div
-            style="
-                width:520px;
-                background:#f6f3e7;
-                margin:120px auto;
-                border-radius:8px;
-                overflow:hidden;
-                border:1px solid #999;
-            ">
-
-            <div
-                style="
-                    padding:20px 25px;
-                    border-bottom:1px solid #999;
-                    font-size:32px;
-                    font-weight:bold;
-                ">
-
-                取引が完了しました。
-
-            </div>
-
-            <div
-                style="
-                    padding:20px 25px;
-                ">
-
-                <p
-                    style="
-                        color:#666;
-                        font-size:14px;
-                        margin-bottom:20px;
-                    ">
-
-                    今回の取引相手はどうでしたか？
-
-                </p>
-
-                <form
-                    action="{{ route('reviews.store', $transaction->id) }}"
-                    method="POST">
-
-                    @csrf
-
+                    {{-- タイトル --}}
                     <div
                         style="
-                            display:flex;
-                            gap:10px;
-                            margin-bottom:25px;
-                        ">
+                padding:20px 25px;
+                border-bottom:1px solid #999;
+                font-size:32px;
+                font-weight:bold;
+            ">
 
-                        @for($i = 1; $i <= 5; $i++)
+                        取引が完了しました。
 
-                        <span
-                            class="star"
-                            onclick="selectStar({{ $i }})"
+                    </div>
+
+                    {{-- 本文 --}}
+                    <div
+                        style="
+                padding:20px 25px;
+            ">
+
+                        <p
                             style="
+                    color:#666;
+                    font-size:14px;
+                    margin-bottom:20px;
+                ">
+
+                            今回の取引相手はどうでしたか？
+
+                        </p>
+
+                        <form
+                            action="{{ route('reviews.store', $transaction->id) }}"
+                            method="POST">
+
+                            @csrf
+
+                            {{-- 星 --}}
+                            <div
+                                style="
+                        display:flex;
+                        gap:10px;
+                        margin-bottom:25px;
+                    ">
+
+                                @for($i = 1; $i <= 5; $i++)
+
+                                    <span
+                                    class="star"
+                                    onclick="selectStar({{ $i }})"
+                                    style="
                                 font-size:70px;
                                 color:#d9d9d9;
                                 cursor:pointer;
                             ">
 
-                            ★
+                                    ★
 
-                        </span>
+                                    </span>
 
-                        @endfor
+                                    @endfor
 
-                    </div>
+                            </div>
 
-                    <input
-                        type="hidden"
-                        name="rating"
-                        id="rating-value">
+                            <input
+                                type="hidden"
+                                name="rating"
+                                id="rating-value">
 
-                    <div
-                        style="
-                            border-top:1px solid #999;
-                            padding-top:20px;
-                            text-align:right;
+                            {{-- ボタン --}}
+                            <div
+                                style="
+                        border-top:1px solid #999;
+                        padding-top:20px;
+                        text-align:right;
+                    ">
+
+                                <button
+                                    type="submit"
+                                    style="
+                            background:#ff8b8b;
+                            color:white;
+                            border:none;
+                            padding:12px 25px;
+                            border-radius:5px;
+                            font-size:20px;
+                            cursor:pointer;
                         ">
 
-                        <button
-                            type="submit"
-                            style="
-                                background:#ff8b8b;
-                                color:white;
-                                border:none;
-                                padding:12px 25px;
-                                border-radius:5px;
-                                font-size:20px;
-                                cursor:pointer;
-                            ">
+                                    送信する
 
-                            送信する
+                                </button>
 
-                        </button>
+                            </div>
+
+                        </form>
 
                     </div>
 
-                </form>
+                </div>
 
             </div>
+        </main>
+        @if(
+        Auth::id() == $transaction->seller_id
+        &&
+        $transaction->status === 'buyer_completed'
+        &&
+        !$transaction->seller_rating
+        )
 
-        </div>
+        <script>
+            window.onload = function() {
+                document.getElementById(
+                    'review-modal'
+                ).style.display = 'block';
+            }
+        </script>
 
+        @endif
+
+        <script>
+            function showEditForm(id) {
+                document.getElementById(
+                    'message-text-' + id
+                ).style.display = 'none';
+
+                document.getElementById(
+                    'edit-form-' + id
+                ).style.display = 'block';
+            }
+
+            function selectStar(rating) {
+                document.getElementById(
+                    'rating-value'
+                ).value = rating;
+
+                const stars =
+                    document.querySelectorAll('.star');
+
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.style.color = '#ffe100';
+                    } else {
+                        star.style.color = '#d9d9d9';
+                    }
+                });
+            }
+        </script>
     </div>
-    <script>
-
-        function selectStar(rating)
-        {
-            document.getElementById(
-                'rating-value'
-            ).value = rating;
-
-            const stars =
-                document.querySelectorAll('.star');
-
-            stars.forEach((star, index) =>
-            {
-                if(index < rating)
-                {
-                    star.style.color = '#ffe100';
-                }
-                else
-                {
-                    star.style.color = '#d9d9d9';
-                }
-            });
-        }
-
-        function showEditForm(id)
-        {
-            document.getElementById(
-                'message-text-' + id
-            ).style.display = 'none';
-
-            document.getElementById(
-                'edit-form-' + id
-            ).style.display = 'block';
-        }
-
-    </script>
-
 </body>
 
 </html>

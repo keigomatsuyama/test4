@@ -2,16 +2,18 @@ body {
     margin: 0;
     font-family: "Helvetica", "Arial", sans-serif;
     background: #fff;
+    color: #000;
 }
-
-/* ----- Header ----- */
-
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     background: #000;
     padding: 10px 20px;
+}
+
+.logo {
+    height: 40px;
 }
 
 .header-center {
@@ -21,7 +23,7 @@ body {
 }
 
 .search-box {
-    width:100%;
+    width: 100%;
     max-width: 400px;
     padding: 10px;
     border-radius: 6px;
@@ -50,6 +52,7 @@ body {
     font-weight: bold;
     font-size: 24px;
 }
+
 
 main {
     max-width: 400px;

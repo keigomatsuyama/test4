@@ -13,23 +13,35 @@ use Illuminate\Support\Str;
 <body>
 
   <body>
-    <header class="header">
-      <div class="header-left">
-        <a href="/">
-          <img src="{{ asset('images/logo.png') }}" alt="ロゴ">
-        </a>
-      </div>
-    </header>
-      <div class="header-center">
-        <form action="{{ route('top') }}" method="GET">
-          <input
-            type="text"
-            name="keyword"
-            class="search-box"
-            placeholder="なにをお探しですか？"
-            value="{{ request('keyword') }}">
-        </form>
-      </div>
+   
+<header class="header">
+    <div class="header-left">
+      <a href="/"><img src="{{ asset('images/logo.png') }}" alt="ロゴ"></a>
+    </div>
+
+
+  <div class="header-center">
+    <form action="{{ route('top') }}" method="GET">
+      <input
+        type="text"
+        name="keyword"
+        class="search-box"
+        placeholder="なにをお探しですか？"
+        value="{{ request('keyword') }}">
+    </form>
+  </div>
+
+  <div class="header-right">
+    <form method="POST" action="{{ route('logout') }}">
+      @csrf
+      <button type="submit" class="header-link" style="background:none;border:none;cursor:pointer;">
+        ログアウト
+      </button>
+    </form>
+    <a href="/mypage" class="header-link">マイページ</a>
+    <a href="/sell" class="sell-btn">出品</a>
+  </div>
+</header>
 
 
       <div class="header-right">
