@@ -12,9 +12,15 @@ class TransactionCompletedMail extends Mailable
 
     public $transaction;
 
-    public function __construct($transaction)
-    {
+    public $partner;
+
+    public function __construct(
+        $transaction,
+        $partner
+    ) {
         $this->transaction = $transaction;
+
+        $this->partner = $partner;
     }
 
     public function build()

@@ -290,9 +290,8 @@
         @endforeach
 
       </div>
-
-      {{-- 入力欄 --}}
-      <div class="message-errors">
+{{-- 入力欄 --}}
+<div class="message-errors">
 
     @error('message')
 
@@ -311,6 +310,7 @@
     @enderror
 
 </div>
+
             <form
                 action="{{ route('message.store', $transaction->id) }}"
                 method="POST"
@@ -475,45 +475,109 @@
   </div>
 
 </div>
+ @if(
+        Auth::id() == $transaction->seller_id
+        &&
+        $transaction->status === 'buyer_completed'
+        &&
+        !$transaction->seller_rating
+        )
 
 <script>
-  function showEditForm(messageId)
-  {
-    // メッセージ非表示
-    document.getElementById(
-      'message-text-' + messageId
-    ).style.display = 'none';
-
-    // 編集フォーム表示
-    document.getElementById(
-      'edit-form-' + messageId
-    ).style.display = 'block';
-  }
-
-  function selectStar(rating)
-  {
-    document.getElementById(
-      'rating-value'
-    ).value = rating;
-
-    const stars =
-      document.querySelectorAll('.star');
-
-    stars.forEach((star, index) =>
+    window.onload = function()
     {
-      if(index < rating)
-      {
-        star.style.color = '#ffe100';
-      }
-      else
-      {
-        star.style.color = '#d9d9d9';
-      }
-    });
-  }
-
+        document.getElementById(
+            'review-modal'
+        ).style.display = 'block';
+    }
 </script>
 
+@endif
+<script>
+    function showEditForm(id)
+    {
+        document.getElementById(
+            'message-text-' + id
+        ).style.display = 'none';
+
+        document.getElementById(
+            'edit-form-' + id
+        ).style.display = 'block';
+    }
+
+    function selectStar(rating)
+    {
+        document.getElementById(
+            'rating-value'
+        ).value = rating;
+
+        const stars =
+            document.querySelectorAll('.star');
+
+        stars.forEach((star, index) =>
+        {
+            if(index < rating)
+            {
+                star.style.color = '#ffe100';
+            }
+            else
+            {
+                star.style.color = '#d9d9d9';
+            }
+        });
+    }
+    const messageInput =
+        document.querySelector(
+    '.message-form input[name="message"]'
+);
+
+    if(messageInput)
+    {
+     const storageKey =
+    'transaction_message_' +
+    {{ $transaction->id }};
+
+        // 復元
+        const saved =
+            localStorage.getItem(storageKey);
+
+        if(saved)
+        {
+            messageInput.value = saved;
+        }
+
+        // 入力保存
+        messageInput.addEventListener(
+            'input',
+            function()
+            {
+                localStorage.setItem(
+                    storageKey,
+                    messageInput.value
+                );
+            }
+        );
+
+        // 送信前保存
+        const form =
+            messageInput.closest('form');
+
+        if(form)
+        {
+            form.addEventListener(
+                'submit',
+                function()
+                {
+                    localStorage.setItem(
+                        storageKey,
+                        messageInput.value
+                    );
+                }
+            );
+        }
+    }
+</script>
+    </div>
 </body>
 
 </html>

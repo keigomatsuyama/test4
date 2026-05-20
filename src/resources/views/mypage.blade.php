@@ -105,16 +105,23 @@ use Illuminate\Support\Str;
         購入した商品
       </a>
 
-      {{-- 取引中の商品 --}}
-      <a href="{{ route('mypage', ['page' => 'transaction']) }}"
-        class="tab-label {{ $page === 'transaction' ? 'active' : '' }}">
-        取引中の商品
-        @if($transactions->count() > 0)
-  <span class="tab-badge">
-    {{ $transactions->count() }}
-  </span>
-@endif
-      </a>
+      {{-- 取引中の商品 --}}{{-- 取引中の商品タブ --}}
+<a
+    href="{{ route('mypage', ['page' => 'transaction']) }}"
+    class="tab-label {{ $page === 'transaction' ? 'active' : '' }}"
+>
+    取引中の商品
+
+    @php
+        $totalUnread = $transactions->sum('unread_count');
+    @endphp
+
+    @if($totalUnread > 0)
+        <span class="tab-badge">
+            {{ $totalUnread }}
+        </span>
+    @endif
+</a>
 
     </div>
 
@@ -210,38 +217,44 @@ use Illuminate\Support\Str;
         $partner = $transaction->seller_id === Auth::id()
         ? $transaction->buyer
         : $transaction->seller;
-        @endphp
+        @endphp<a href="{{ route('transactions.show', $transaction->id) }}"
+   class="item-link">
+<div class="item-card">
 
-      <a href="{{ route('transactions.show', $transaction->id) }}"
-          class="item-link">
+    @if($transaction->unread_count)
 
-          <div class="item-card">
-            @if($transaction->unread_count > 0)
+        <span class="item-badge">
+            {{ $transaction->unread_count }}
+        </span>
 
-            <span class="item-badge">
-              {{ $transaction->unread_count }}
-            </span>
+    @endif
 
-            @endif
-            @if (Str::startsWith($item->image_path, 'items/'))
-            <img src="{{ asset('storage/' . $item->image_path) }}" alt="商品画像">
-            @else
-            <img src="{{ asset('images/' . $item->image_path) }}" alt="商品画像">
-            @endif
+    @if (Str::startsWith($item->image_path, 'items/'))
 
-            <p class="item-name">
-              {{ $item->name }}
-            </p>
+        <img
+            src="{{ asset('storage/' . $item->image_path) }}"
+            alt="商品画像">
 
-            <p class="transaction-user">
-              取引相手：
-              {{ $partner->profile->username ?? 'ユーザー' }}
-            </p>
+    @else
 
-          </div>
+        <img
+            src="{{ asset('images/' . $item->image_path) }}"
+            alt="商品画像">
 
-        </a>
+    @endif
 
+        <p class="item-name">
+            {{ $item->name }}
+        </p>
+
+        <p class="transaction-user">
+            取引相手：
+            {{ $partner->profile->username ?? 'ユーザー' }}
+        </p>
+
+    </div>
+
+</a>
         @empty
 
         <p class="empty-message">

@@ -233,7 +233,7 @@
                             style="
                                     margin-top:10px;
                                 "
-                                class="edit-save-btn">
+                            class="edit-save-btn">
 
                             保存
 
@@ -333,8 +333,27 @@
                 @endforeach
 
             </div>
+            {{-- 入力欄 --}}
+            <div class="message-errors">
 
-            {{-- ================= 入力欄 ================= --}}
+                @error('message')
+
+                <p class="error-message">
+                    {{ $message }}
+                </p>
+
+                @enderror
+
+                @error('image')
+
+                <p class="error-message">
+                    {{ $message }}
+                </p>
+
+                @enderror
+
+            </div>
+
             <form
                 action="{{ route('message.store', $transaction->id) }}"
                 method="POST"
@@ -502,44 +521,101 @@
         !$transaction->seller_rating
         )
 
-        <script>
-            window.onload = function() {
-                document.getElementById(
-                    'review-modal'
-                ).style.display = 'block';
+<script>
+    window.onload = function()
+    {
+        document.getElementById(
+            'review-modal'
+        ).style.display = 'block';
+    }
+</script>
+
+@endif
+<script>
+    function showEditForm(id)
+    {
+        document.getElementById(
+            'message-text-' + id
+        ).style.display = 'none';
+
+        document.getElementById(
+            'edit-form-' + id
+        ).style.display = 'block';
+    }
+
+    function selectStar(rating)
+    {
+        document.getElementById(
+            'rating-value'
+        ).value = rating;
+
+        const stars =
+            document.querySelectorAll('.star');
+
+        stars.forEach((star, index) =>
+        {
+            if(index < rating)
+            {
+                star.style.color = '#ffe100';
             }
-        </script>
-
-        @endif
-
-        <script>
-            function showEditForm(id) {
-                document.getElementById(
-                    'message-text-' + id
-                ).style.display = 'none';
-
-                document.getElementById(
-                    'edit-form-' + id
-                ).style.display = 'block';
+            else
+            {
+                star.style.color = '#d9d9d9';
             }
+        });
+    }
 
-            function selectStar(rating) {
-                document.getElementById(
-                    'rating-value'
-                ).value = rating;
+    const messageInput =
+        document.querySelector(
+            'input[name="message"]'
+        );
 
-                const stars =
-                    document.querySelectorAll('.star');
+    if(messageInput)
+    {
+     const storageKey =
+    'transaction_message_' +
+    {{ $transaction->id }};
 
-                stars.forEach((star, index) => {
-                    if (index < rating) {
-                        star.style.color = '#ffe100';
-                    } else {
-                        star.style.color = '#d9d9d9';
-                    }
-                });
+        // 復元
+        const saved =
+            localStorage.getItem(storageKey);
+
+        if(saved)
+        {
+            messageInput.value = saved;
+        }
+
+        // 入力保存
+        messageInput.addEventListener(
+            'input',
+            function()
+            {
+                localStorage.setItem(
+                    storageKey,
+                    messageInput.value
+                );
             }
-        </script>
+        );
+
+        // 送信前保存
+        const form =
+            messageInput.closest('form');
+
+        if(form)
+        {
+            form.addEventListener(
+                'submit',
+                function()
+                {
+                    localStorage.setItem(
+                        storageKey,
+                        messageInput.value
+                    );
+                }
+            );
+        }
+    }
+</script>
     </div>
 </body>
 

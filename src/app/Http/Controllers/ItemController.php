@@ -75,18 +75,18 @@ class ItemController extends Controller
             'CASE WHEN exhibitions.id IN (SELECT exhibition_id FROM purchases) THEN 1 ELSE 0 END'
         );
         $completedItemIds =
-    Transaction::where(
-        'status',
-        'completed'
-    )->pluck('item_id');
+            Transaction::where(
+                'status',
+                'completed'
+            )->pluck('item_id');
 
-$items = $query
-    ->whereNotIn(
-        'id',
-        $completedItemIds
-    )
-    ->orderBy('created_at', 'desc')
-    ->get();
+        $items = $query
+            ->whereNotIn(
+                'id',
+                $completedItemIds
+            )
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         $soldItemIds = Purchase::pluck('exhibition_id')->toArray();
 
@@ -115,19 +115,6 @@ $items = $query
                 ->contains($item->id);
         }
 
-        // ★ transaction取得
-        $transactionId = request('transaction');
-
-        // ★ 未読を0に
-        if ($transactionId) {
-
-            $transaction = Transaction::find($transactionId);
-
-            if ($transaction) {
-
-                $transaction->increment('unread_count');
-            }
-        }
 
         return view('item', [
             'item' => $item,
@@ -158,33 +145,33 @@ $items = $query
         return back();
     }
 
-public function edit($item_id)
-{
-    $item = Exhibition::findOrFail($item_id);
+    public function edit($item_id)
+    {
+        $item = Exhibition::findOrFail($item_id);
 
-    $profile = auth()->user()->profile;
+        $profile = auth()->user()->profile;
 
-    return view('purchase_address', compact('item', 'profile'));
-}
+        return view('purchase_address', compact('item', 'profile'));
+    }
 
-public function update(Request $request, $item_id)
-{
-    $request->validate([
-        'postal_code' => 'required',
-        'address' => 'required',
-        'building' => 'nullable',
-    ]);
+    public function update(Request $request, $item_id)
+    {
+        $request->validate([
+            'postal_code' => 'required',
+            'address' => 'required',
+            'building' => 'nullable',
+        ]);
 
-    $profile = auth()->user()->profile;
+        $profile = auth()->user()->profile;
 
-    $profile->update([
-        'postal_code' => $request->postal_code,
-        'address' => $request->address,
-        'building' => $request->building,
-    ]);
+        $profile->update([
+            'postal_code' => $request->postal_code,
+            'address' => $request->address,
+            'building' => $request->building,
+        ]);
 
-   return redirect()->route('purchase.show', ['item_id' => $item_id]);
-}
+        return redirect()->route('purchase.show', ['item_id' => $item_id]);
+    }
     public function purchase(Request $request, $item_id)
     {
         session(['purchase_item_id' => $item_id]); // 購入中の商品IDを保持
@@ -277,6 +264,19 @@ public function update(Request $request, $item_id)
             'seller.profile'
         ])->findOrFail($id);
 
+        // 相手のメッセージを既読にする
+        TransactionMessage::where(
+            'transaction_id',
+            $transaction->id
+        )
+            ->where('user_id', '!=', Auth::id())
+            ->where('is_read', false)
+            ->update([
+                'is_read' => true
+            ]);
+$transaction->unread_count = 0;
+
+$transaction->save();
         $isSeller =
             $transaction->seller_id === Auth::id();
 
@@ -284,19 +284,37 @@ public function update(Request $request, $item_id)
             $isSeller
             ? $transaction->buyer
             : $transaction->seller;
+       // 出品中の取引
+$sellTransactions = Transaction::with('messages')
+    ->where(
+        'seller_id',
+        Auth::id()
+    )
+    ->get()
+    ->sortByDesc(function ($transaction)
+    {
+      return optional(
+    $transaction->messages
+        ->sortByDesc('created_at')
+        ->first()
+)->created_at;
+    });
 
-        // 出品中の取引
-        $sellTransactions = Transaction::where(
-            'seller_id',
-            Auth::id()
-        )->get();
-
-        // 購入中の取引
-        $buyTransactions = Transaction::where(
-            'buyer_id',
-            Auth::id()
-        )->get();
-
+// 購入中の取引
+$buyTransactions = Transaction::with('messages')
+    ->where(
+        'buyer_id',
+        Auth::id()
+    )
+    ->get()
+    ->sortByDesc(function ($transaction)
+    {
+       return optional(
+    $transaction->messages
+        ->sortByDesc('created_at')
+        ->first()
+)->created_at;
+    });
         $messages = $transaction->messages;
 
         if ($isSeller) {
@@ -388,38 +406,39 @@ public function update(Request $request, $item_id)
 
         if ($page === 'sell') {
 
-           $sellingItems = Exhibition::where(
-    'user_id',
-    Auth::id()
-)
-->whereNotIn(
-    'id',
-    Transaction::where(
-        'status',
-        'completed'
-    )->pluck('item_id')
-)
-->get();
-
+            $sellingItems = Exhibition::where(
+                'user_id',
+                Auth::id()
+            )
+                ->whereNotIn(
+                    'id',
+                    Transaction::where(
+                        'status',
+                        'completed'
+                    )->pluck('item_id')
+                )
+                ->get();
         } elseif ($page === 'buy') {
 
-           $boughtItems = Purchase::where(
-    'user_id',
-    Auth::id()
-)
-->whereNotIn(
-    'exhibition_id',
-    Transaction::where(
-        'status',
-        'completed'
-    )->pluck('item_id')
-)
-->get();
+            $boughtItems = Purchase::where(
+                'user_id',
+                Auth::id()
+            )
+                ->whereNotIn(
+                    'exhibition_id',
+                    Transaction::where(
+                        'status',
+                        'completed'
+                    )->pluck('item_id')
+                )
+                ->get();
         } elseif ($page === 'transaction') {
+
             $transactions = Transaction::with([
                 'item',
                 'seller.profile',
                 'buyer.profile',
+                'messages'
             ])
                 ->where(function ($query) {
 
@@ -429,7 +448,7 @@ public function update(Request $request, $item_id)
                         $q->where('seller_id', Auth::id())
                             ->whereIn('status', [
                                 'trading',
-                                'buyer_completed'
+                                'buyer_completed',
                             ]);
                     })
 
@@ -440,10 +459,13 @@ public function update(Request $request, $item_id)
                                 ->where('status', 'trading');
                         });
                 })
-                ->get();
+               ->latest('updated_at')
+->get();
         }
+    
         $averageRating =
             Auth::user()->averageRating();
+
         return view('mypage', compact(
             'page',
             'sellingItems',
@@ -499,6 +521,8 @@ public function update(Request $request, $item_id)
 
         $message->message = $request->message;
 
+        $message->is_read = false;
+
         if ($request->hasFile('image')) {
 
             $imagePath = $request
@@ -507,10 +531,15 @@ public function update(Request $request, $item_id)
 
             $message->image_path = $imagePath;
         }
+$message->save();
 
-        $message->save();
+$transaction = Transaction::find($id);
 
-        return back();
+$transaction->unread_count++;
+$transaction->touch();
+$transaction->save();
+
+return back();
     }
     public function messageDestroy(
         TransactionMessage $message
@@ -544,23 +573,34 @@ public function update(Request $request, $item_id)
                 'max:5'
             ],
         ]);
-
         if (Auth::id() == $transaction->buyer_id) {
+
+            // 購入者の評価を保存
             $transaction->buyer_rating =
                 $request->rating;
 
+            // 購入者側の取引完了
             $transaction->status =
                 'buyer_completed';
+
+            // 取引相手
+            $partner = $transaction->buyer;
+
+            // 出品者へメール送信
             Mail::to($transaction->seller->email)
                 ->send(
                     new TransactionCompletedMail(
-                        $transaction
+                        $transaction,
+                        $partner
                     )
                 );
         } else {
+
+            // 出品者の評価を保存
             $transaction->seller_rating =
                 $request->rating;
 
+            // 完全に取引完了
             $transaction->status =
                 'completed';
         }

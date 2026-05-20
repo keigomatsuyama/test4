@@ -4,7 +4,9 @@ body {
     font-family: "Helvetica", "Arial", sans-serif;
     background: #fff;
 }
-
+* {
+    box-sizing: border-box;
+}
 /* ===== Header ===== */
 .header {
     display: flex;
@@ -56,8 +58,7 @@ body {
     padding: 20px;
     font-size: 36px;
 }
-.profile-header
-{
+.profile-header {
     display: flex;
 
     justify-content: space-between;
@@ -69,16 +70,14 @@ body {
     padding: 0 120px;
 }
 
-.profile-left
-{
+.profile-left {
     display: flex;
 
     align-items: center;
 
     gap: 20px;
 }
-.profile-info
-{
+.profile-info {
     display: flex;
 
     flex-direction: column;
@@ -87,8 +86,7 @@ body {
 
     gap: 10px;
 }
-.profile-info h2
-{
+.profile-info h2 {
     margin: 0;
 }
 .rating-stars {
@@ -166,39 +164,37 @@ body {
     margin-top: 30px;
     justify-content: flex-start;
 }
+.item-link {
+    text-decoration: none;
 
+    color: black;
+}
 .item-card {
     width: 200px;
-    text-align: relative;
-}
-.item-link {
     position: relative;
-    display: block;
-    text-decoration: none;
-    color: black;
 }
 .item-badge {
     position: absolute;
 
-    top: 8px;
-    left: 8px;
+    top: 10px;
+    left: 10px;
 
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
 
     border-radius: 50%;
 
-    background: #ff3b30;
+    background-color: red;
     color: white;
-
-    font-size: 12px;
-    font-weight: bold;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    z-index: 10;
+    font-size: 14px;
+    font-weight: bold;
+
+    z-index: 9999;
 }
 .item-card img {
     width: 200px;
@@ -210,9 +206,19 @@ body {
 
 .item-name {
     margin-top: 10px;
+
     font-size: 25px;
+
+    color: black;
+
+    text-decoration: none;
 }
 
+.item-name a {
+    color: black;
+
+    text-decoration: none;
+}
 .item-price {
     margin-top: 5px;
     font-size: 25px;
@@ -242,8 +248,16 @@ body {
     text-align: center;
 
     margin-top: 10px;
+    text-decoration: none;
+
+    color: black;
 
     word-break: keep-all;
+}
+.transaction-user a {
+    text-decoration: none;
+
+    color: black;
 }
 .empty-message {
     margin-top: 20px;
@@ -260,4 +274,80 @@ body {
 
 .star.filled {
     color: #ffe100;
+}
+@media screen and (max-width: 850px) {
+    .header {
+        flex-wrap: wrap;
+
+        gap: 10px;
+
+        padding: 10px;
+    }
+
+    .header-center {
+        width: 100%;
+
+        order: 3;
+
+        margin-top: 10px;
+    }
+
+    .search-box {
+        max-width: 100%;
+
+        font-size: 16px;
+    }
+
+    .header-right {
+        gap: 10px;
+    }
+
+    .header-link,
+    .sell-btn {
+        font-size: 16px;
+    }
+
+    .profile-header {
+        padding: 0 20px;
+
+        flex-direction: column;
+
+        gap: 20px;
+
+        align-items: center;
+    }
+
+    .profile-left {
+        flex-direction: column;
+
+        text-align: center;
+    }
+
+    .tabs .tab-label {
+        font-size: 18px;
+    }
+
+    .items-wrapper {
+        gap: 20px;
+
+        justify-content: center;
+    }
+
+    .item-card {
+        width: 160px;
+    }
+
+    .item-card img {
+        width: 160px;
+        height: 160px;
+    }
+
+    .item-name,
+    .item-price {
+        font-size: 20px;
+    }
+
+    .transaction-user {
+        font-size: 16px;
+    }
 }
