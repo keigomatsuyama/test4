@@ -66,16 +66,16 @@
           </h2>
 
         </div>
-<button
-  type="button"
-  class="complete-btn"
-  onclick="
+        <button
+          type="button"
+          class="complete-btn"
+          onclick="
     document.getElementById('review-modal').style.display='block';
   ">
 
-  取引を完了する
+          取引を完了する
 
-</button>
+        </button>
 
 
       </div>
@@ -127,23 +127,23 @@
               {{ $message->user->profile->username ?? 'ユーザー名' }}
             </span>
 
-           <div class="message-avatar">
+            <div class="message-avatar">
 
-    @if($message->user->profile?->profile_image)
+              @if($message->user->profile?->profile_image)
 
-        <img
-            src="{{ asset('storage/' . $message->user->profile->profile_image) }}"
-            alt=""
-            style="
+              <img
+                src="{{ asset('storage/' . $message->user->profile->profile_image) }}"
+                alt=""
+                style="
                 width:50px;
                 height:50px;
                 border-radius:50%;
                 object-fit:cover;
             ">
 
-    @endif
+              @endif
 
-</div>
+            </div>
 
           </div>
 
@@ -153,13 +153,13 @@
             id="message-text-{{ $message->id }}">
 
             {{ $message->message }}
-  @if($message->image_path)
+            @if($message->image_path)
 
-  <img
-    src="{{ asset('storage/' . $message->image_path) }}"
-    style="max-width:200px; margin-top:10px;">
+            <img
+              src="{{ asset('storage/' . $message->image_path) }}"
+              style="max-width:200px; margin-top:10px;">
 
-  @endif
+            @endif
 
           </div>
 
@@ -168,7 +168,7 @@
             id="edit-form-{{ $message->id }}"
             action="{{ route('message.update', $message->id) }}"
             method="POST"
-              enctype="multipart/form-data"
+            enctype="multipart/form-data"
             style="display:none;"
             class="edit-form">
 
@@ -180,36 +180,36 @@
               name="message"
               value="{{ $message->message }}"
               class="edit-input">
- <input
-    type="file"
-    name="image">
+            <input
+              type="file"
+              name="image">
 
-  {{-- 現在画像 --}}
-  @if($message->image_path)
+            {{-- 現在画像 --}}
+            @if($message->image_path)
 
-  <div style="margin-top:10px;">
+            <div style="margin-top:10px;">
 
-    <img
-      src="{{ asset('storage/' . $message->image_path) }}"
-      style="max-width:120px;">
+              <img
+                src="{{ asset('storage/' . $message->image_path) }}"
+                style="max-width:120px;">
 
-  </div>
+            </div>
 
-  {{-- 画像削除 --}}
-  <label>
+            {{-- 画像削除 --}}
+            <label>
 
-    <input
-      type="checkbox"
-      name="delete_image"
-      value="1">
+              <input
+                type="checkbox"
+                name="delete_image"
+                value="1">
 
-    画像を削除
+              画像を削除
 
-  </label>
+            </label>
 
-  @endif
+            @endif
             <button type="submit"
-            class="edit-save-btn">
+              class="edit-save-btn">
               保存
             </button>
 
@@ -270,17 +270,17 @@
 
             {{ $message->message }}
 
-@if($message->image_path)
+            @if($message->image_path)
 
-<img
-    src="{{ asset('storage/' . $message->image_path) }}"
-    style="
+            <img
+              src="{{ asset('storage/' . $message->image_path) }}"
+              style="
         max-width:200px;
         margin-top:10px;
         border-radius:10px;
     ">
 
-@endif
+            @endif
           </div>
 
         </div>
@@ -290,70 +290,70 @@
         @endforeach
 
       </div>
-{{-- 入力欄 --}}
-<div class="message-errors">
+      {{-- 入力欄 --}}
+      <div class="message-errors">
 
-    @error('message')
+        @error('message')
 
-    <p class="error-message">
-        {{ $message }}
-    </p>
+        <p class="error-message">
+          {{ $message }}
+        </p>
 
-    @enderror
+        @enderror
 
-    @error('image')
+        @error('image')
 
-    <p class="error-message">
-        {{ $message }}
-    </p>
+        <p class="error-message">
+          {{ $message }}
+        </p>
 
-    @enderror
+        @enderror
 
-</div>
+      </div>
 
-            <form
-                action="{{ route('message.store', $transaction->id) }}"
-                method="POST"
-                class="message-form"
-                enctype="multipart/form-data">
+      <form
+        action="{{ route('message.store', $transaction->id) }}"
+        method="POST"
+        class="message-form"
+        enctype="multipart/form-data">
 
-                @csrf
+        @csrf
 
-                <input
-                    type="text"
-                    name="message"
-                    placeholder="取引メッセージを記入してください">
+        <input
+          type="text"
+          id="messageInput"
+          name="message"
+          placeholder="取引メッセージを記入してください">
 
+        <label class="image-btn">
 
-                <label class="image-btn">
+          画像を追加
 
-                    画像を追加
+          <input
+            type="file"
+            name="image"
+            hidden>
 
-                    <input
-                        type="file"
-                        name="image"
-                        hidden>
+        </label>
 
-                </label>
+        <button
+          type="submit"
+          class="send-btn">
 
-                <button
-                    type="submit"
-                    class="send-btn">
+          ➤
 
-                    ➤
+        </button>
 
-                </button>
-
-            </form>
+      </form>
 
     </main>
 
   </div>
 
   {{-- ================= 評価モーダル ================= --}}
-<div
-  id="review-modal"
-  style="
+  <div
+    id="review-modal"
+    style="
     display:none;
     position:fixed;
     top:0;
@@ -364,8 +364,8 @@
     z-index:99999;
   ">
 
-  <div
-    style="
+    <div
+      style="
       width:520px;
       background:#f6f3e7;
       margin:120px auto;
@@ -374,85 +374,85 @@
       border:1px solid #999;
     ">
 
-    {{-- タイトル --}}
-    <div
-      style="
+      {{-- タイトル --}}
+      <div
+        style="
         padding:20px 25px;
         border-bottom:1px solid #999;
         font-size:32px;
         font-weight:bold;
       ">
 
-      取引が完了しました。
+        取引が完了しました。
 
-    </div>
+      </div>
 
-    {{-- 本文 --}}
-    <div
-      style="
+      {{-- 本文 --}}
+      <div
+        style="
         padding:20px 25px;
       ">
 
-      <p
-        style="
+        <p
+          style="
           color:#666;
           font-size:14px;
           margin-bottom:20px;
         ">
 
-        今回の取引相手はどうでしたか？
+          今回の取引相手はどうでしたか？
 
-      </p>
+        </p>
 
-      <form
-        action="{{ route('reviews.store', $transaction->id) }}"
-        method="POST">
+        <form
+          action="{{ route('reviews.store', $transaction->id) }}"
+          method="POST">
 
-        @csrf
+          @csrf
 
-        {{-- 星 --}}
-        <div
-          style="
+          {{-- 星 --}}
+          <div
+            style="
             display:flex;
             gap:10px;
             margin-bottom:25px;
           ">
 
-          @for($i = 1; $i <= 5; $i++)
+            @for($i = 1; $i <= 5; $i++)
 
-          <span
-            class="star"
-            onclick="selectStar({{ $i }})"
-            style="
+              <span
+              class="star"
+              onclick="selectStar({{ $i }})"
+              style="
               font-size:70px;
               color:#d9d9d9;
               cursor:pointer;
             ">
 
-            ★
+              ★
 
-          </span>
+              </span>
 
-          @endfor
+              @endfor
 
-        </div>
+          </div>
 
-        <input
-          type="hidden"
-          name="rating"
-          id="rating-value">
+          <input
+            type="hidden"
+            name="rating"
+            id="rating-value">
 
-        {{-- ボタン --}}
-        <div
-          style="
+          {{-- ボタン --}}
+          <div
+            style="
             border-top:1px solid #999;
             padding-top:20px;
             text-align:right;
           ">
 
-          <button
-            type="submit"
-            style="
+            <button
+              type="submit"
+              style="
               background:#ff8b8b;
               color:white;
               border:none;
@@ -462,122 +462,66 @@
               cursor:pointer;
             ">
 
-            送信する
+              送信する
 
-          </button>
+            </button>
 
-        </div>
+          </div>
 
-      </form>
+        </form>
+
+      </div>
 
     </div>
 
   </div>
-
-</div>
- @if(
-        Auth::id() == $transaction->seller_id
-        &&
-        $transaction->status === 'buyer_completed'
-        &&
-        !$transaction->seller_rating
-        )
-
-<script>
-    window.onload = function()
-    {
-        document.getElementById(
-            'review-modal'
-        ).style.display = 'block';
+  @if(
+  Auth::id() == $transaction->seller_id
+  &&
+  $transaction->status === 'buyer_completed'
+  &&
+  !$transaction->seller_rating
+  )
+  <script>
+    window.onload = function() {
+      document.getElementById(
+        'review-modal'
+      ).style.display = 'block';
     }
-</script>
+  </script>
+  @endif
+  <script>
+    const input =
+      document.getElementById(
+        'messageInput'
+      );
 
-@endif
-<script>
-    function showEditForm(id)
-    {
-        document.getElementById(
-            'message-text-' + id
-        ).style.display = 'none';
+    if (input) {
 
-        document.getElementById(
-            'edit-form-' + id
-        ).style.display = 'block';
-    }
+      const transactionId =
+        "{{ $transaction->id }}";
 
-    function selectStar(rating)
-    {
-        document.getElementById(
-            'rating-value'
-        ).value = rating;
+      const storageKey =
+        `draft_${transactionId}`;
 
-        const stars =
-            document.querySelectorAll('.star');
+      input.value =
+        localStorage.getItem(storageKey) ||
+        '';
 
-        stars.forEach((star, index) =>
-        {
-            if(index < rating)
-            {
-                star.style.color = '#ffe100';
-            }
-            else
-            {
-                star.style.color = '#d9d9d9';
-            }
-        });
-    }
-    const messageInput =
-        document.querySelector(
-    '.message-form input[name="message"]'
-);
+      input.addEventListener(
+        'input',
+        () => {
 
-    if(messageInput)
-    {
-     const storageKey =
-    'transaction_message_' +
-    {{ $transaction->id }};
+          localStorage.setItem(
+            storageKey,
+            input.value
+          );
 
-        // 復元
-        const saved =
-            localStorage.getItem(storageKey);
-
-        if(saved)
-        {
-            messageInput.value = saved;
         }
-
-        // 入力保存
-        messageInput.addEventListener(
-            'input',
-            function()
-            {
-                localStorage.setItem(
-                    storageKey,
-                    messageInput.value
-                );
-            }
-        );
-
-        // 送信前保存
-        const form =
-            messageInput.closest('form');
-
-        if(form)
-        {
-            form.addEventListener(
-                'submit',
-                function()
-                {
-                    localStorage.setItem(
-                        storageKey,
-                        messageInput.value
-                    );
-                }
-            );
-        }
+      );
     }
-</script>
-    </div>
+  </script>
+  </div>
 </body>
 
 </html>

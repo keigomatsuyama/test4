@@ -274,9 +274,7 @@ class ItemController extends Controller
             ->update([
                 'is_read' => true
             ]);
-$transaction->unread_count = 0;
 
-$transaction->save();
         $isSeller =
             $transaction->seller_id === Auth::id();
 
@@ -285,20 +283,24 @@ $transaction->save();
             ? $transaction->buyer
             : $transaction->seller;
        // 出品中の取引
-$sellTransactions = Transaction::with('messages')
-    ->where(
-        'seller_id',
-        Auth::id()
-    )
-    ->get()
-    ->sortByDesc(function ($transaction)
-    {
-      return optional(
-    $transaction->messages
-        ->sortByDesc('created_at')
-        ->first()
-)->created_at;
-    });
+$sellTransactions = Transaction::with([
+    'messages',
+    'item'
+])
+->where('seller_id', Auth::id())
+->whereIn('status', [
+    'trading',
+    'buyer_completed'
+])
+->get()
+->sortByDesc(function ($transaction)
+{
+    return optional(
+        $transaction->messages
+            ->sortByDesc('created_at')
+            ->first()
+    )->created_at;
+});
 
 // 購入中の取引
 $buyTransactions = Transaction::with('messages')
@@ -310,12 +312,19 @@ $buyTransactions = Transaction::with('messages')
     ->sortByDesc(function ($transaction)
     {
        return optional(
-    $transaction->messages
-        ->sortByDesc('created_at')
-        ->first()
-)->created_at;
+            $transaction->messages
+                ->sortByDesc('created_at')
+                ->first()
+        )->created_at;
     });
-        $messages = $transaction->messages;
+
+$sideTransactions =
+    $sellTransactions
+    ->merge($buyTransactions)
+    ->unique('id');
+
+$messages = $transaction->messages;
+
 
         if ($isSeller) {
 
@@ -325,6 +334,7 @@ $buyTransactions = Transaction::with('messages')
                 'messages',
                 'sellTransactions',
                 'buyTransactions',
+                'sideTransactions',
                 'isSeller',
             ));
         }
@@ -335,6 +345,7 @@ $buyTransactions = Transaction::with('messages')
             'messages',
             'sellTransactions',
             'buyTransactions',
+             'sideTransactions',
             'isSeller',
         ));
     }
@@ -432,7 +443,8 @@ $buyTransactions = Transaction::with('messages')
                     )->pluck('item_id')
                 )
                 ->get();
-        } elseif ($page === 'transaction') {
+        } elseif ($page === 'transaction')
+        {
 
             $transactions = Transaction::with([
                 'item',
@@ -459,10 +471,17 @@ $buyTransactions = Transaction::with('messages')
                                 ->where('status', 'trading');
                         });
                 })
-               ->latest('updated_at')
+->latest('updated_at')
 ->get();
+$transactions->each(function ($transaction)
+{
+    $transaction->unread_count =
+        $transaction->messages
+        ->where('user_id', '!=', Auth::id())
+        ->where('is_read', false)
+        ->count() > 0 ? 1 : 0;
+});
         }
-    
         $averageRating =
             Auth::user()->averageRating();
 
@@ -534,8 +553,17 @@ $buyTransactions = Transaction::with('messages')
 $message->save();
 
 $transaction = Transaction::find($id);
+if (Auth::id() == $transaction->seller_id) {
 
-$transaction->unread_count++;
+    $transaction->buyer_unread = true;
+    $transaction->seller_unread = false;
+
+} else {
+
+    $transaction->seller_unread = true;
+    $transaction->buyer_unread = false;
+}
+
 $transaction->touch();
 $transaction->save();
 

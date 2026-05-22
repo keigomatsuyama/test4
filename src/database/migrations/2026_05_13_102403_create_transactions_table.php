@@ -36,8 +36,11 @@ class CreateTransactionsTable extends Migration
 
             $table->integer('seller_rating')
                 ->nullable();
-            $table->integer('unread_count')
-                ->default(0);
+            $table->boolean('seller_unread')
+                ->default(false);
+
+            $table->boolean('buyer_unread')
+                ->default(false);
             $table->timestamps();
         });
     }

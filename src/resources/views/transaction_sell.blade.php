@@ -37,6 +37,8 @@
                 その他の取引
             </h2>
 
+            @if($isSeller)
+
             @foreach($sellTransactions as $sideTransaction)
 
             <a
@@ -48,6 +50,22 @@
             </a>
 
             @endforeach
+
+            @else
+
+            @foreach($buyTransactions as $sideTransaction)
+
+            <a
+                href="{{ route('transactions.show', $sideTransaction->id) }}"
+                class="sidebar-item">
+
+                {{ $sideTransaction->item->name }}
+
+            </a>
+
+            @endforeach
+
+            @endif
 
         </aside>
 
@@ -364,9 +382,9 @@
 
                 <input
                     type="text"
+                    id="messageInput"
                     name="message"
                     placeholder="取引メッセージを記入してください">
-
                 <label class="image-btn">
 
                     画像を追加
@@ -520,103 +538,45 @@
         &&
         !$transaction->seller_rating
         )
-
-<script>
-    window.onload = function()
-    {
-        document.getElementById(
-            'review-modal'
-        ).style.display = 'block';
-    }
-</script>
-
-@endif
-<script>
-    function showEditForm(id)
-    {
-        document.getElementById(
-            'message-text-' + id
-        ).style.display = 'none';
-
-        document.getElementById(
-            'edit-form-' + id
-        ).style.display = 'block';
-    }
-
-    function selectStar(rating)
-    {
-        document.getElementById(
-            'rating-value'
-        ).value = rating;
-
-        const stars =
-            document.querySelectorAll('.star');
-
-        stars.forEach((star, index) =>
-        {
-            if(index < rating)
-            {
-                star.style.color = '#ffe100';
+        <script>
+            window.onload = function() {
+                document.getElementById(
+                    'review-modal'
+                ).style.display = 'block';
             }
-            else
-            {
-                star.style.color = '#d9d9d9';
-            }
-        });
-    }
+        </script>
+        @endif
+        <script>
+            const input =
+                document.getElementById(
+                    'messageInput'
+                );
 
-    const messageInput =
-        document.querySelector(
-            'input[name="message"]'
-        );
+            if (input) {
 
-    if(messageInput)
-    {
-     const storageKey =
-    'transaction_message_' +
-    {{ $transaction->id }};
+                const transactionId =
+                    "{{ $transaction->id }}";
 
-        // 復元
-        const saved =
-            localStorage.getItem(storageKey);
+                const storageKey =
+                    `draft_${transactionId}`;
 
-        if(saved)
-        {
-            messageInput.value = saved;
-        }
+                input.value =
+                    localStorage.getItem(storageKey) ||
+                    '';
 
-        // 入力保存
-        messageInput.addEventListener(
-            'input',
-            function()
-            {
-                localStorage.setItem(
-                    storageKey,
-                    messageInput.value
+                input.addEventListener(
+                    'input',
+                    () => {
+
+                        localStorage.setItem(
+                            storageKey,
+                            input.value
+                        );
+
+                    }
                 );
             }
-        );
-
-        // 送信前保存
-        const form =
-            messageInput.closest('form');
-
-        if(form)
-        {
-            form.addEventListener(
-                'submit',
-                function()
-                {
-                    localStorage.setItem(
-                        storageKey,
-                        messageInput.value
-                    );
-                }
-            );
-        }
-    }
-</script>
-    </div>
+        </script>
 </body>
 
 </html>

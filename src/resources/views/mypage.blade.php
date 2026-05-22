@@ -217,7 +217,8 @@ use Illuminate\Support\Str;
         $partner = $transaction->seller_id === Auth::id()
         ? $transaction->buyer
         : $transaction->seller;
-        @endphp<a href="{{ route('transactions.show', $transaction->id) }}"
+        @endphp
+        <a href="{{ route('transactions.show', $transaction->id) }}"
    class="item-link">
 <div class="item-card">
 
